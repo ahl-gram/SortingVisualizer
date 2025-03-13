@@ -11,17 +11,20 @@ struct ContentView: View {
     @State private var arraySize: Double = 50
     @State private var animationSpeed: Double = 1.0
     @StateObject private var viewModel = SortingViewModel()
+    @State private var safeAreaInsets: EdgeInsets = EdgeInsets()
     
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Removed NavigationView wrapper as it's restricting width in landscape
+                // Add safe area insets reader to capture dynamic island and other insets
+                SafeAreaInsetsReader(insets: $safeAreaInsets)
+                
                 VStack(spacing: 0) {
                     Text("Sorting Visualizer")
                         .font(.title)
                         .padding(.top, 5)
                     
-                    // Sorting visualization area - expanded to use more space
+                    // Sorting visualization area with proper insets
                     if viewModel.bars.isEmpty {
                         Text("Press 'Randomize Array' to start")
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -29,9 +32,9 @@ struct ContentView: View {
                             .padding(.horizontal, 5)
                     } else {
                         // Calculate the width for each bar to fill the available space
-                        // with a small fixed gap between bars
+                        // while respecting safe areas
                         GeometryReader { vizGeometry in
-                            let availableWidth = vizGeometry.size.width
+                            let availableWidth = vizGeometry.size.width - safeAreaInsets.leading - safeAreaInsets.trailing
                             let barCount = viewModel.bars.count
                             let barSpacing: CGFloat = 2
                             let totalSpacingWidth = barSpacing * CGFloat(barCount - 1)
@@ -48,6 +51,9 @@ struct ContentView: View {
                             }
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .background(Color.black)
+                            // Apply padding based on safe area insets
+                            .padding(.leading, safeAreaInsets.leading)
+                            .padding(.trailing, safeAreaInsets.trailing)
                         }
                         .padding(.horizontal, 5)
                     }
@@ -93,7 +99,7 @@ struct ContentView: View {
                         .padding(.bottom, 5)
                     }
                 }
-                .ignoresSafeArea(edges: [])
+                // Don't ignore safe areas
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .avoidDynamicIsland()
                 .onAppear {
@@ -112,7 +118,7 @@ struct ContentView: View {
                 }
             }
         }
-        .edgesIgnoringSafeArea(.all)
+        .respectSafeAreas() // Use our custom modifier instead of ignoring safe areas
     }
 }
 
