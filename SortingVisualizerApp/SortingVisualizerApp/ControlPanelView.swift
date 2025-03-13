@@ -10,6 +10,7 @@ import SwiftUI
 struct ControlPanelView: View {
     @Binding var arraySize: Double
     @Binding var animationSpeed: Double
+    var onRandomize: () -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -42,6 +43,18 @@ struct ControlPanelView: View {
                 .padding(.vertical, 5)
                 .accessibilityLabel("Animation Speed Slider")
                 .accessibilityHint("Adjust to change the speed of the sorting animation")
+            
+            // Randomize Array Button
+            Button(action: onRandomize) {
+                Text("Randomize Array")
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+            }
+            .padding(.top, 10)
+            .accessibilityLabel("Randomize Array Button")
         }
         .padding()
         .background(Color.gray.opacity(0.1))
@@ -53,7 +66,11 @@ struct ControlPanelView: View {
     @State var previewArraySize: Double = 50
     @State var previewAnimationSpeed: Double = 1.0
     
-    return ControlPanelView(arraySize: $previewArraySize, animationSpeed: $previewAnimationSpeed)
-        .frame(width: 300)
-        .padding()
+    return ControlPanelView(
+        arraySize: $previewArraySize,
+        animationSpeed: $previewAnimationSpeed,
+        onRandomize: { print("Randomize tapped") }
+    )
+    .frame(width: 300)
+    .padding()
 } 
