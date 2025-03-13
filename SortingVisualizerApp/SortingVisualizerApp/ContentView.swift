@@ -53,6 +53,7 @@ struct ContentView: View {
                 .padding()
             }
             .padding()
+            .avoidDynamicIsland()
             .onAppear {
                 // Initialize with a random array
                 viewModel.randomizeArray(size: Int(arraySize))
