@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ControlPanelView: View {
     @Binding var arraySize: Double
+    @Binding var animationSpeed: Double
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -16,6 +17,7 @@ struct ControlPanelView: View {
                 .font(.headline)
                 .padding(.bottom, 5)
             
+            // Array Size Slider
             HStack {
                 Text("Array Size:")
                 Spacer()
@@ -27,6 +29,19 @@ struct ControlPanelView: View {
                 .padding(.vertical, 5)
                 .accessibilityLabel("Array Size Slider")
                 .accessibilityHint("Adjust to change the number of elements in the array")
+            
+            // Animation Speed Slider
+            HStack {
+                Text("Animation Speed:")
+                Spacer()
+                Text("\(String(format: "%.1f", animationSpeed))x")
+                    .frame(width: 40, alignment: .trailing)
+            }
+            
+            Slider(value: $animationSpeed, in: 0.1...5.0, step: 0.1)
+                .padding(.vertical, 5)
+                .accessibilityLabel("Animation Speed Slider")
+                .accessibilityHint("Adjust to change the speed of the sorting animation")
         }
         .padding()
         .background(Color.gray.opacity(0.1))
@@ -36,8 +51,9 @@ struct ControlPanelView: View {
 
 #Preview {
     @State var previewArraySize: Double = 50
+    @State var previewAnimationSpeed: Double = 1.0
     
-    return ControlPanelView(arraySize: $previewArraySize)
+    return ControlPanelView(arraySize: $previewArraySize, animationSpeed: $previewAnimationSpeed)
         .frame(width: 300)
         .padding()
 } 
