@@ -11,7 +11,14 @@ import SwiftUI
 class SortingViewModel: ObservableObject {
     @Published var bars: [SortingBar] = []
     @Published var isSorting: Bool = false
+    @Published var isAudioEnabled: Bool = true {
+        didSet {
+            audioManager.setAudioEnabled(isAudioEnabled)
+        }
+    }
+    
     private var sortingTask: Task<Void, Never>?
+    private let audioManager = AudioManager()
     
     struct SortingBar: Identifiable {
         let id = UUID()
@@ -79,10 +86,22 @@ class SortingViewModel: ObservableObject {
                         bars[j].state = .comparing
                         bars[j + 1].state = .comparing
                     }
+                    
+                    // Play tone for the first bar being compared
+                    if isAudioEnabled {
+                        audioManager.playTone(forValue: bars[j].value)
+                    }
                 }
                 
                 // Delay for visualization
                 try? await Task.sleep(nanoseconds: UInt64(500_000_000 / animationSpeed))
+                
+                // Play tone for the second bar being compared
+                await MainActor.run {
+                    if isAudioEnabled {
+                        audioManager.playTone(forValue: bars[j + 1].value)
+                    }
+                }
                 
                 if bars[j].value > bars[j + 1].value {
                     // Swap the elements
@@ -116,6 +135,11 @@ class SortingViewModel: ObservableObject {
                 withAnimation(.easeInOut(duration: 0.5)) {
                     bars[n - i - 1].state = .sorted
                 }
+                
+                // Play a higher tone for sorted element
+                if isAudioEnabled {
+                    audioManager.playTone(forValue: 200) // Play the highest tone for sorted elements
+                }
             }
             
             // If no swapping occurred in this pass, the array is already sorted
@@ -136,8 +160,17 @@ class SortingViewModel: ObservableObject {
             for i in 0..<bars.count {
                 if bars[i].state != .sorted {
                     bars[i].state = .sorted
+                    
+                    // Play a tone for each newly sorted element
+                    if isAudioEnabled {
+                        audioManager.playTone(forValue: 200)
+                    }
                 }
             }
         }
+    }
+    
+    deinit {
+        audioManager.cleanup()
     }
 } 

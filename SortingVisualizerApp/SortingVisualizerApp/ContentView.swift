@@ -38,6 +38,7 @@ struct ContentView: View {
                 ControlPanelView(
                     arraySize: $arraySize,
                     animationSpeed: $animationSpeed,
+                    isAudioEnabled: $viewModel.isAudioEnabled,
                     onRandomize: {
                         viewModel.randomizeArray(size: Int(arraySize))
                     },

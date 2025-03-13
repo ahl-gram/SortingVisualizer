@@ -10,6 +10,7 @@ import SwiftUI
 struct ControlPanelView: View {
     @Binding var arraySize: Double
     @Binding var animationSpeed: Double
+    @Binding var isAudioEnabled: Bool
     var onRandomize: () -> Void
     var onStartSorting: () -> Void
     var onStopSorting: () -> Void
@@ -47,6 +48,14 @@ struct ControlPanelView: View {
                 .padding(.vertical, 5)
                 .accessibilityLabel("Animation Speed Slider")
                 .accessibilityHint("Adjust to change the speed of the sorting animation")
+            
+            // Audio Toggle
+            Toggle(isOn: $isAudioEnabled) {
+                Text("Audio Feedback")
+            }
+            .padding(.vertical, 5)
+            .accessibilityLabel("Audio Feedback Toggle")
+            .accessibilityHint("Toggle to enable or disable audio feedback during sorting")
             
             HStack(spacing: 10) {
                 // Randomize Array Button
@@ -95,10 +104,12 @@ struct ControlPanelView: View {
 #Preview {
     @State var previewArraySize: Double = 50
     @State var previewAnimationSpeed: Double = 1.0
+    @State var previewAudioEnabled: Bool = true
     
     return ControlPanelView(
         arraySize: $previewArraySize,
         animationSpeed: $previewAnimationSpeed,
+        isAudioEnabled: $previewAudioEnabled,
         onRandomize: { print("Randomize tapped") },
         onStartSorting: { print("Start Sorting tapped") },
         onStopSorting: { print("Stop Sorting tapped") },
