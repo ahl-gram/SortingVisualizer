@@ -16,6 +16,7 @@ class SortingViewModel: ObservableObject {
             audioManager.setAudioEnabled(isAudioEnabled)
         }
     }
+    @Published var showCompletionAnimation: Bool = false
     
     private var sortingTask: Task<Void, Never>?
     private let audioManager = AudioManager()
@@ -29,6 +30,9 @@ class SortingViewModel: ObservableObject {
     func randomizeArray(size: Int) {
         // Stop any ongoing sorting
         stopSorting()
+        
+        // Reset completion animation flag
+        showCompletionAnimation = false
         
         // Generate a new array of random values
         var newBars: [SortingBar] = []
@@ -47,6 +51,9 @@ class SortingViewModel: ObservableObject {
         // Cancel any existing sorting task
         stopSorting()
         
+        // Reset completion animation flag
+        showCompletionAnimation = false
+        
         // Set sorting flag
         isSorting = true
         
@@ -60,6 +67,7 @@ class SortingViewModel: ObservableObject {
         sortingTask?.cancel()
         sortingTask = nil
         isSorting = false
+        showCompletionAnimation = false
         
         // Reset all bars to unsorted state
         for i in 0..<bars.count {
@@ -148,9 +156,10 @@ class SortingViewModel: ObservableObject {
             }
         }
         
-        // Mark all remaining elements as sorted
+        // Mark all remaining elements as sorted and show completion animation
         await MainActor.run {
             markAllAsSorted()
+            showCompletionAnimation = true
             isSorting = false
         }
     }
