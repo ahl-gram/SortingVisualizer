@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var arraySize: Double = 50
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -19,8 +21,8 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(Color.gray.opacity(0.2))
                 Spacer()
-                // Placeholder for control components (sliders and buttons)
-                Text("Control panel here")
+                // Control panel components
+                ControlPanelView(arraySize: $arraySize)
                     .padding()
             }
             .padding()
