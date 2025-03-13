@@ -9,16 +9,26 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationView {
+            VStack {
+                Text("Sorting Visualizer")
+                    .font(.largeTitle)
+                Spacer()
+                // Placeholder for visual components (sorting animation)
+                Text("Sorting animation here")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.gray.opacity(0.2))
+                Spacer()
+                // Placeholder for control components (sliders and buttons)
+                Text("Control panel here")
+                    .padding()
+            }
+            .padding()
         }
-        .padding()
     }
 }
 
 #Preview {
     ContentView()
+        .previewInterfaceOrientation(.landscapeLeft)
 }
