@@ -62,8 +62,11 @@ class SortingViewModel: ObservableObject {
     
     private func bubbleSort(animationSpeed: Double) async {
         let n = bars.count
+        var swapped = false
         
         for i in 0..<n {
+            swapped = false
+            
             for j in 0..<n - i - 1 {
                 // Check if the task was cancelled
                 if Task.isCancelled {
@@ -72,39 +75,56 @@ class SortingViewModel: ObservableObject {
                 
                 // Animate comparison
                 await MainActor.run {
-                    bars[j].state = .comparing
-                    bars[j + 1].state = .comparing
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        bars[j].state = .comparing
+                        bars[j + 1].state = .comparing
+                    }
                 }
                 
                 // Delay for visualization
-                try? await Task.sleep(nanoseconds: UInt64(1_000_000_000 / animationSpeed))
+                try? await Task.sleep(nanoseconds: UInt64(500_000_000 / animationSpeed))
                 
                 if bars[j].value > bars[j + 1].value {
                     // Swap the elements
                     await MainActor.run {
-                        let temp = bars[j]
-                        bars[j] = bars[j + 1]
-                        bars[j + 1] = temp
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            let temp = bars[j]
+                            bars[j] = bars[j + 1]
+                            bars[j + 1] = temp
+                        }
                     }
                     
+                    swapped = true
+                    
                     // Delay for visualization
-                    try? await Task.sleep(nanoseconds: UInt64(1_000_000_000 / animationSpeed))
+                    try? await Task.sleep(nanoseconds: UInt64(500_000_000 / animationSpeed))
                 }
                 
                 // Reset the state of the compared elements
                 await MainActor.run {
-                    bars[j].state = .unsorted
-                    bars[j + 1].state = .unsorted
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        bars[j].state = .unsorted
+                        if j < n - i - 1 {
+                            bars[j + 1].state = .unsorted
+                        }
+                    }
                 }
             }
             
             // Mark the last element as sorted
             await MainActor.run {
-                bars[n - i - 1].state = .sorted
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    bars[n - i - 1].state = .sorted
+                }
+            }
+            
+            // If no swapping occurred in this pass, the array is already sorted
+            if !swapped {
+                break
             }
         }
         
-        // Mark all elements as sorted
+        // Mark all remaining elements as sorted
         await MainActor.run {
             markAllAsSorted()
             isSorting = false
@@ -112,8 +132,12 @@ class SortingViewModel: ObservableObject {
     }
     
     private func markAllAsSorted() {
-        for i in 0..<bars.count {
-            bars[i].state = .sorted
+        withAnimation(.easeInOut(duration: 1.0)) {
+            for i in 0..<bars.count {
+                if bars[i].state != .sorted {
+                    bars[i].state = .sorted
+                }
+            }
         }
     }
 } 
