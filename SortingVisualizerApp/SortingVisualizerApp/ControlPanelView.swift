@@ -11,6 +11,8 @@ struct ControlPanelView: View {
     @Binding var arraySize: Double
     @Binding var animationSpeed: Double
     var onRandomize: () -> Void
+    var onStartSorting: () -> Void
+    var isSorting: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -30,6 +32,7 @@ struct ControlPanelView: View {
                 .padding(.vertical, 5)
                 .accessibilityLabel("Array Size Slider")
                 .accessibilityHint("Adjust to change the number of elements in the array")
+                .disabled(isSorting)
             
             // Animation Speed Slider
             HStack {
@@ -44,17 +47,32 @@ struct ControlPanelView: View {
                 .accessibilityLabel("Animation Speed Slider")
                 .accessibilityHint("Adjust to change the speed of the sorting animation")
             
-            // Randomize Array Button
-            Button(action: onRandomize) {
-                Text("Randomize Array")
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
+            HStack(spacing: 10) {
+                // Randomize Array Button
+                Button(action: onRandomize) {
+                    Text("Randomize Array")
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                .disabled(isSorting)
+                .accessibilityLabel("Randomize Array Button")
+                
+                // Start Sorting Button
+                Button(action: onStartSorting) {
+                    Text("Start Sorting")
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                .disabled(isSorting)
+                .accessibilityLabel("Start Sorting Button")
             }
             .padding(.top, 10)
-            .accessibilityLabel("Randomize Array Button")
         }
         .padding()
         .background(Color.gray.opacity(0.1))
@@ -69,8 +87,10 @@ struct ControlPanelView: View {
     return ControlPanelView(
         arraySize: $previewArraySize,
         animationSpeed: $previewAnimationSpeed,
-        onRandomize: { print("Randomize tapped") }
+        onRandomize: { print("Randomize tapped") },
+        onStartSorting: { print("Start Sorting tapped") },
+        isSorting: false
     )
-    .frame(width: 300)
+    .frame(width: 500)
     .padding()
 } 

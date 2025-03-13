@@ -40,7 +40,11 @@ struct ContentView: View {
                     animationSpeed: $animationSpeed,
                     onRandomize: {
                         viewModel.randomizeArray(size: Int(arraySize))
-                    }
+                    },
+                    onStartSorting: {
+                        viewModel.startBubbleSort(animationSpeed: animationSpeed)
+                    },
+                    isSorting: viewModel.isSorting
                 )
                 .padding()
             }
