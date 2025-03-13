@@ -13,12 +13,20 @@ enum BarState {
 
 struct SortingBarView: View {
     var height: CGFloat
+    var width: CGFloat
     var state: BarState
+    
+    // For backward compatibility, provide a default width
+    init(height: CGFloat, state: BarState, width: CGFloat = 5) {
+        self.height = height
+        self.state = state
+        self.width = width
+    }
     
     var body: some View {
         Rectangle()
             .fill(colorForState(state))
-            .frame(width: 5, height: height)
+            .frame(width: width, height: height)
             .shadow(color: shadowForState(state), radius: state == .comparing ? 3 : 0)
             .overlay(
                 Rectangle()
@@ -47,9 +55,9 @@ struct SortingBarView: View {
 
 #Preview {
     HStack {
-        SortingBarView(height: 50, state: .unsorted)
-        SortingBarView(height: 100, state: .comparing)
-        SortingBarView(height: 150, state: .sorted)
+        SortingBarView(height: 50, state: .unsorted, width: 10)
+        SortingBarView(height: 100, state: .comparing, width: 15)
+        SortingBarView(height: 150, state: .sorted, width: 20)
     }
     .background(Color.black)
 } 

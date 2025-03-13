@@ -13,14 +13,18 @@ class AudioManager {
     private var tonePlayer: AVAudioPlayerNode
     private var mixer: AVAudioMixerNode
     private var isAudioEnabled: Bool = true
+    private var outputFormat: AVAudioFormat
     
     init() {
         audioEngine = AVAudioEngine()
         tonePlayer = AVAudioPlayerNode()
         mixer = audioEngine.mainMixerNode
         
+        // Get the output format from the mixer
+        outputFormat = mixer.outputFormat(forBus: 0)
+        
         audioEngine.attach(tonePlayer)
-        audioEngine.connect(tonePlayer, to: mixer, format: mixer.outputFormat(forBus: 0))
+        audioEngine.connect(tonePlayer, to: mixer, format: outputFormat)
         
         do {
             try audioEngine.start()
@@ -41,27 +45,31 @@ class AudioManager {
         let frequency = baseFrequency + (normalizedValue * 880.0) // Range from A3 to A5
         
         // Create a short tone
-        let audioFormat = mixer.outputFormat(forBus: 0)
-        let sampleRate = Float(audioFormat.sampleRate)
+        let sampleRate = Float(outputFormat.sampleRate)
         let duration: Float = 0.1 // 100ms tone
         
-        let buffer = createToneBuffer(frequency: frequency, duration: duration, sampleRate: sampleRate)
+        let buffer = createToneBuffer(frequency: frequency, duration: duration)
         
         // Play the tone
         tonePlayer.scheduleBuffer(buffer, at: nil, options: .interrupts, completionHandler: nil)
-        tonePlayer.play()
+        
+        if !tonePlayer.isPlaying {
+            tonePlayer.play()
+        }
     }
     
-    private func createToneBuffer(frequency: Float, duration: Float, sampleRate: Float) -> AVAudioPCMBuffer {
+    private func createToneBuffer(frequency: Float, duration: Float) -> AVAudioPCMBuffer {
+        let sampleRate = Float(outputFormat.sampleRate)
         let frameCount = AVAudioFrameCount(duration * sampleRate)
-        let audioFormat = AVAudioFormat(standardFormatWithSampleRate: Double(sampleRate), channels: 1)!
         
-        let buffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: frameCount)!
+        // Use the same format as the mixer's output
+        let buffer = AVAudioPCMBuffer(pcmFormat: outputFormat, frameCapacity: frameCount)!
         buffer.frameLength = frameCount
         
         let omega = 2.0 * Float.pi * frequency / sampleRate
+        let channelCount = Int(outputFormat.channelCount)
         
-        // Fill the buffer with a sine wave
+        // Fill the buffer with a sine wave for all channels
         for frame in 0..<Int(frameCount) {
             let value = sin(omega * Float(frame))
             
@@ -77,7 +85,10 @@ class AudioManager {
                 amplitude *= Float(Int(frameCount) - frame) / Float(attackReleaseSamples)
             }
             
-            buffer.floatChannelData?[0][frame] = value * amplitude
+            // Fill all channels with the same value
+            for channel in 0..<channelCount {
+                buffer.floatChannelData?[channel][frame] = value * amplitude
+            }
         }
         
         return buffer
@@ -85,6 +96,10 @@ class AudioManager {
     
     func setAudioEnabled(_ enabled: Bool) {
         isAudioEnabled = enabled
+        
+        if !enabled && tonePlayer.isPlaying {
+            tonePlayer.stop()
+        }
     }
     
     func cleanup() {
