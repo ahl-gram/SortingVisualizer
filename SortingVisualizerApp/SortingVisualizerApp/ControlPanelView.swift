@@ -12,6 +12,7 @@ struct ControlPanelView: View {
     @Binding var animationSpeed: Double
     var onRandomize: () -> Void
     var onStartSorting: () -> Void
+    var onStopSorting: () -> Void
     var isSorting: Bool
     
     var body: some View {
@@ -60,17 +61,28 @@ struct ControlPanelView: View {
                 .disabled(isSorting)
                 .accessibilityLabel("Randomize Array Button")
                 
-                // Start Sorting Button
-                Button(action: onStartSorting) {
-                    Text("Start Sorting")
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
+                // Start/Stop Sorting Button
+                if isSorting {
+                    Button(action: onStopSorting) {
+                        Text("Stop Sorting")
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.red)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                    .accessibilityLabel("Stop Sorting Button")
+                } else {
+                    Button(action: onStartSorting) {
+                        Text("Start Sorting")
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.green)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                    .accessibilityLabel("Start Sorting Button")
                 }
-                .disabled(isSorting)
-                .accessibilityLabel("Start Sorting Button")
             }
             .padding(.top, 10)
         }
@@ -89,6 +101,7 @@ struct ControlPanelView: View {
         animationSpeed: $previewAnimationSpeed,
         onRandomize: { print("Randomize tapped") },
         onStartSorting: { print("Start Sorting tapped") },
+        onStopSorting: { print("Stop Sorting tapped") },
         isSorting: false
     )
     .frame(width: 500)

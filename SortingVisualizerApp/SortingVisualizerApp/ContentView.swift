@@ -44,6 +44,9 @@ struct ContentView: View {
                     onStartSorting: {
                         viewModel.startBubbleSort(animationSpeed: animationSpeed)
                     },
+                    onStopSorting: {
+                        viewModel.stopSorting()
+                    },
                     isSorting: viewModel.isSorting
                 )
                 .padding()
