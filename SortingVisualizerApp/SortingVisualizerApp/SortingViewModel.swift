@@ -42,16 +42,89 @@ class SortingViewModel: ObservableObject {
         // Generate a new array of random values
         var newBars: [SortingBar] = []
         
-        // Scale the range of values based on array size to ensure they're visually appealing
-        // For smaller arrays, allow taller bars
-        // For larger arrays, keep the height more constrained to avoid overcrowding
+        // Define height parameters
         let minHeight = 10
-        let maxHeight = min(200, 400 - size * 2) // Reduce max height as array size increases
         
-        for _ in 0..<size {
-            let randomValue = Int.random(in: minHeight...maxHeight)
-            newBars.append(SortingBar(value: randomValue))
+        // Use higher maximum heights overall to better utilize vertical space
+        // Even with many bars, we want significant height differences
+        let maxHeight: Int
+        switch size {
+        case 10...30:
+            maxHeight = 500  // Maximum height for small arrays - increased for more dramatic effect
+        case 31...60:
+            maxHeight = 450  // Medium-sized arrays - higher than before
+        default:
+            maxHeight = 400  // Large arrays - significantly higher than before
         }
+        
+        // For larger arrays, ensure better distribution across the full height range
+        if size > 50 {
+            // Create a statistical distribution that favors varied heights
+            
+            // Add a bar with maximum height to ensure we use the full height
+            newBars.append(SortingBar(value: maxHeight))
+            
+            // Add a bar with minimum height
+            newBars.append(SortingBar(value: minHeight))
+            
+            // Add some bars in the upper range (top 25%)
+            let upperQuartile = maxHeight - (maxHeight - minHeight) / 4
+            for _ in 0..<max(3, size / 20) {
+                let value = Int.random(in: upperQuartile...maxHeight)
+                newBars.append(SortingBar(value: value))
+            }
+            
+            // Add some bars in the lower range (bottom 25%)
+            let lowerQuartile = minHeight + (maxHeight - minHeight) / 4
+            for _ in 0..<max(3, size / 20) {
+                let value = Int.random(in: minHeight...lowerQuartile)
+                newBars.append(SortingBar(value: value))
+            }
+            
+            // Fill the rest with a wider distribution
+            // Use a curve that creates more variety
+            for _ in 0..<(size - newBars.count) {
+                // Use biased randomization to create more variety
+                let bias = Double.random(in: 0.0...1.0)
+                let biasedRandom: Int
+                
+                if bias < 0.5 {
+                    // Bias toward lower values with some medium ones
+                    biasedRandom = Int.random(in: minHeight...(minHeight + (maxHeight - minHeight) / 2))
+                } else if bias < 0.8 {
+                    // Some middle range values
+                    biasedRandom = Int.random(in: (minHeight + (maxHeight - minHeight) / 3)...(minHeight + 2 * (maxHeight - minHeight) / 3))
+                } else {
+                    // Some higher values
+                    biasedRandom = Int.random(in: (minHeight + 2 * (maxHeight - minHeight) / 3)...maxHeight)
+                }
+                
+                newBars.append(SortingBar(value: biasedRandom))
+            }
+        } else {
+            // For smaller arrays, ensure we have full range coverage
+            // Add a bar with maximum height
+            newBars.append(SortingBar(value: maxHeight))
+            
+            // Add a bar with minimum height
+            newBars.append(SortingBar(value: minHeight))
+            
+            // Add a few bars at different quartiles to ensure good distribution
+            if size > 15 {
+                newBars.append(SortingBar(value: minHeight + (maxHeight - minHeight) / 4))  // Q1
+                newBars.append(SortingBar(value: minHeight + (maxHeight - minHeight) / 2))  // Q2 (median)
+                newBars.append(SortingBar(value: minHeight + 3 * (maxHeight - minHeight) / 4)) // Q3
+            }
+            
+            // Fill the rest with random heights
+            for _ in 0..<(size - newBars.count) {
+                let randomValue = Int.random(in: minHeight...maxHeight)
+                newBars.append(SortingBar(value: randomValue))
+            }
+        }
+        
+        // Shuffle the array to randomize the positions
+        newBars.shuffle()
         
         // Update the bars array
         withAnimation {

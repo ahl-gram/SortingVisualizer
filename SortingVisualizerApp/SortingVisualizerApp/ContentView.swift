@@ -52,8 +52,8 @@ struct ContentView: View {
                             let barWidth = max(1, (availableWidth - totalSpacingWidth) / CGFloat(barCount))
                             
                             // Calculate maximum bar height to prevent overlap with control panel
-                            // Use 70% of the available height to ensure we leave space for the control panel
-                            let maxAvailableHeight = vizGeometry.size.height * 0.7
+                            // Use 95% of the available height to ensure we leave space for the control panel
+                            let maxAvailableHeight = vizGeometry.size.height * 0.95
                             
                             // Find the max value in the array to normalize heights
                             let maxBarValue = viewModel.bars.map { $0.value }.max() ?? 200

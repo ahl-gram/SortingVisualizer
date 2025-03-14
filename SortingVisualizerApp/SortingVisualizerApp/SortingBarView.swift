@@ -25,7 +25,7 @@ struct SortingBarView: View {
     
     var body: some View {
         Rectangle()
-            .fill(colorForState(state))
+            .fill(gradientForState(state))
             .frame(width: width, height: height)
             .shadow(color: shadowForState(state), radius: state == .comparing ? 3 : 0)
             .overlay(
@@ -34,6 +34,29 @@ struct SortingBarView: View {
             )
             .animation(.easeInOut(duration: 0.3), value: state)
             .accessibilityLabel("Bar with height \(Int(height)) and state \(state)")
+    }
+    
+    func gradientForState(_ state: BarState) -> LinearGradient {
+        switch state {
+        case .unsorted: 
+            return LinearGradient(
+                gradient: Gradient(colors: [Color.white.opacity(0.9), Color.white]),
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        case .comparing: 
+            return LinearGradient(
+                gradient: Gradient(colors: [Color.green.opacity(0.8), Color.green]),
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        case .sorted: 
+            return LinearGradient(
+                gradient: Gradient(colors: [Color(red: 0, green: 0.7, blue: 0.9), Color(red: 0.3, green: 0.8, blue: 1.0)]),
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        }
     }
     
     func colorForState(_ state: BarState) -> Color {
