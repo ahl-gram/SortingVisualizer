@@ -31,7 +31,7 @@ struct ContentView: View {
                         Text("Press 'Randomize Array' to start")
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .background(Color.gray.opacity(0.2))
-                            .padding(.horizontal, geometry.size.width > geometry.size.height ? 16 : 5)
+                            .padding(.horizontal, 16)
                     } else {
                         // Calculate the width for each bar to fill the available space
                         // while respecting safe areas
@@ -81,52 +81,28 @@ struct ContentView: View {
                     
                     Spacer(minLength: 10)
                     
-                    // Control panel components - adaptive layout based on orientation
-                    if geometry.size.width > geometry.size.height {
-                        // Landscape mode - wider control panel
-                        ControlPanelView(
-                            arraySize: $arraySize,
-                            animationSpeed: $animationSpeed,
-                            isAudioEnabled: $viewModel.isAudioEnabled,
-                            selectedAlgorithm: $viewModel.selectedAlgorithm,
-                            onRandomize: {
-                                viewModel.randomizeArray(size: Int(arraySize))
-                            },
-                            onStartSorting: {
-                                viewModel.startSorting(animationSpeed: animationSpeed)
-                            },
-                            onStopSorting: {
-                                viewModel.stopSorting()
-                            },
-                            isSorting: viewModel.isSorting
-                        )
-                        .padding(.horizontal, 5)
-                        .padding(.bottom, 5)
-                        .background(Color.black.opacity(0.1))
-                        // Set minimum height for the control panel to ensure all controls are visible
-                        .frame(minHeight: 180)
-                    } else {
-                        // Portrait mode - more compact control panel
-                        CompactControlPanelView(
-                            arraySize: $arraySize,
-                            animationSpeed: $animationSpeed,
-                            isAudioEnabled: $viewModel.isAudioEnabled,
-                            selectedAlgorithm: $viewModel.selectedAlgorithm,
-                            onRandomize: {
-                                viewModel.randomizeArray(size: Int(arraySize))
-                            },
-                            onStartSorting: {
-                                viewModel.startSorting(animationSpeed: animationSpeed)
-                            },
-                            onStopSorting: {
-                                viewModel.stopSorting()
-                            },
-                            isSorting: viewModel.isSorting
-                        )
-                        .padding(.horizontal, 0)
-                        .padding(.bottom, 5)
-                        .background(Color.black.opacity(0.1))
-                    }
+                    // Control panel
+                    ControlPanelView(
+                        arraySize: $arraySize,
+                        animationSpeed: $animationSpeed,
+                        isAudioEnabled: $viewModel.isAudioEnabled,
+                        selectedAlgorithm: $viewModel.selectedAlgorithm,
+                        onRandomize: {
+                            viewModel.randomizeArray(size: Int(arraySize))
+                        },
+                        onStartSorting: {
+                            viewModel.startSorting(animationSpeed: animationSpeed)
+                        },
+                        onStopSorting: {
+                            viewModel.stopSorting()
+                        },
+                        isSorting: viewModel.isSorting
+                    )
+                    .padding(.horizontal, 5)
+                    .padding(.bottom, 5)
+                    .background(Color.black.opacity(0.1))
+                    // Set minimum height for the control panel to ensure all controls are visible
+                    .frame(minHeight: 180)
                 }
                 // Don't ignore safe areas
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -163,116 +139,9 @@ struct ContentView: View {
     }
 }
 
-// Compact version of control panel for portrait mode
-struct CompactControlPanelView: View {
-    @Binding var arraySize: Double
-    @Binding var animationSpeed: Double
-    @Binding var isAudioEnabled: Bool
-    @Binding var selectedAlgorithm: SortingAlgorithmType
-    var onRandomize: () -> Void
-    var onStartSorting: () -> Void
-    var onStopSorting: () -> Void
-    var isSorting: Bool
-    
-    var body: some View {
-        VStack(spacing: 5) {
-            // Top row with controls label and audio toggle
-            HStack {
-                Text("Controls")
-                    .font(.headline)
-                
-                Spacer()
-                
-                Toggle(isOn: $isAudioEnabled) {
-                    Text("Audio")
-                        .font(.callout)
-                }
-                .labelsHidden()
-                .toggleStyle(SwitchToggleStyle(tint: .blue))
-            }
-            
-            // Algorithm picker
-            HStack {
-                Text("Algorithm:")
-                    .font(.caption)
-                
-                Picker("Algorithm", selection: $selectedAlgorithm) {
-                    ForEach(SortingAlgorithmType.allCases) { algorithm in
-                        Text(algorithm.rawValue).tag(algorithm)
-                    }
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                .disabled(isSorting)
-                .frame(maxWidth: .infinity)
-            }
-            .padding(.vertical, 2)
-            
-            // Array Size slider
-            HStack {
-                Text("Size: \(Int(arraySize))")
-                    .font(.caption)
-                    .frame(width: 55, alignment: .leading)
-                Slider(value: $arraySize, in: 10...100, step: 1)
-                    .disabled(isSorting)
-            }
-            
-            // Animation Speed slider
-            HStack {
-                Text("Speed: \(String(format: "%.1f", animationSpeed))x")
-                    .font(.caption)
-                    .frame(width: 55, alignment: .leading)
-                Slider(value: $animationSpeed, in: 0.1...20.0, step: 0.1)
-            }
-            
-            // Buttons in a row
-            HStack(spacing: 8) {
-                Button(action: onRandomize) {
-                    Text("Randomize")
-                        .padding(.vertical, 8)
-                        .frame(maxWidth: .infinity)
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                        .font(.callout)
-                }
-                .disabled(isSorting)
-                
-                if isSorting {
-                    Button(action: onStopSorting) {
-                        Text("Stop")
-                            .padding(.vertical, 8)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.red)
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
-                            .font(.callout)
-                    }
-                } else {
-                    Button(action: onStartSorting) {
-                        Text("Start")
-                            .padding(.vertical, 8)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.green)
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
-                            .font(.callout)
-                    }
-                }
-            }
-        }
-        .padding(8)
-        .background(Color.gray.opacity(0.1))
-        .cornerRadius(10)
-    }
-}
-
 #Preview {
     ContentView()
-}
-
-#Preview("Portrait") {
-    ContentView()
-        .previewInterfaceOrientation(.portrait)
+        .previewInterfaceOrientation(.landscapeLeft)
 }
 
 #Preview("Landscape") {
