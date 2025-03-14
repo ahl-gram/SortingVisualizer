@@ -18,6 +18,7 @@ class SortingViewModel: ObservableObject {
     }
     @Published var showCompletionAnimation: Bool = false
     
+    // MARK: - Private properties
     private var sortingTask: Task<Void, Never>?
     private let audioManager = AudioManager()
     
@@ -32,6 +33,7 @@ class SortingViewModel: ObservableObject {
         var state: BarState = .unsorted
     }
     
+    // MARK: - Public methods
     func randomizeArray(size: Int) {
         // Stop any ongoing sorting
         stopSorting()
@@ -112,7 +114,22 @@ class SortingViewModel: ObservableObject {
         
         // Start a new sorting task
         sortingTask = Task {
-            await bubbleSort(animationSpeed: animationSpeed)
+            await SortingAlgorithms.bubbleSort(
+                bars: bars,
+                animationSpeed: animationSpeed,
+                isAudioEnabled: isAudioEnabled,
+                audioManager: audioManager,
+                updateBars: { [weak self] updatedBars in
+                    self?.bars = updatedBars
+                },
+                markAllAsSorted: { [weak self] in
+                    self?.markAllAsSorted()
+                },
+                onComplete: { [weak self] in
+                    self?.showCompletionAnimation = true
+                    self?.isSorting = false
+                }
+            )
         }
     }
     
@@ -125,100 +142,6 @@ class SortingViewModel: ObservableObject {
         // Reset all bars to unsorted state
         for i in 0..<bars.count {
             bars[i].state = .unsorted
-        }
-    }
-    
-    private func bubbleSort(animationSpeed: Double) async {
-        let n = bars.count
-        var swapped = false
-        
-        for i in 0..<n {
-            swapped = false
-            
-            for j in 0..<n - i - 1 {
-                // Check if the task was cancelled
-                if Task.isCancelled {
-                    return
-                }
-                
-                // Animate comparison
-                await MainActor.run {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        bars[j].state = .comparing
-                        bars[j + 1].state = .comparing
-                    }
-                    
-                    // Play tone for the first bar being compared
-                    if isAudioEnabled {
-                        audioManager.playTone(forValue: bars[j].value)
-                    }
-                }
-                
-                // Delay for visualization
-                // Use linear scaling across the entire range (0.1x-20.0x)
-                let baseDelay: UInt64 = 500_000_000 // 0.5 seconds in nanoseconds
-                let scaledDelay = UInt64(Double(baseDelay) / animationSpeed)
-                
-                try? await Task.sleep(nanoseconds: scaledDelay)
-                
-                // Play tone for the second bar being compared
-                await MainActor.run {
-                    if isAudioEnabled {
-                        audioManager.playTone(forValue: bars[j + 1].value)
-                    }
-                }
-                
-                if bars[j].value > bars[j + 1].value {
-                    // Swap the elements
-                    await MainActor.run {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            let temp = bars[j]
-                            bars[j] = bars[j + 1]
-                            bars[j + 1] = temp
-                        }
-                    }
-                    
-                    swapped = true
-                    
-                    // Delay for visualization after swap
-                    let swapDelay = scaledDelay // use the same scaled delay calculated above
-                    try? await Task.sleep(nanoseconds: swapDelay)
-                }
-                
-                // Reset the state of the compared elements
-                await MainActor.run {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        bars[j].state = .unsorted
-                        if j < n - i - 1 {
-                            bars[j + 1].state = .unsorted
-                        }
-                    }
-                }
-            }
-            
-            // Mark the last element as sorted
-            await MainActor.run {
-                withAnimation(.easeInOut(duration: 0.5)) {
-                    bars[n - i - 1].state = .sorted
-                }
-                
-                // Play a higher tone for sorted element
-                if isAudioEnabled {
-                    audioManager.playTone(forValue: 200) // Play the highest tone for sorted elements
-                }
-            }
-            
-            // If no swapping occurred in this pass, the array is already sorted
-            if !swapped {
-                break
-            }
-        }
-        
-        // Mark all remaining elements as sorted and show completion animation
-        await MainActor.run {
-            markAllAsSorted()
-            showCompletionAnimation = true
-            isSorting = false
         }
     }
     
