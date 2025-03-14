@@ -21,6 +21,11 @@ class SortingViewModel: ObservableObject {
     private var sortingTask: Task<Void, Never>?
     private let audioManager = AudioManager()
     
+    // Computed property to detect when bars are being compared
+    var hasComparingBars: Bool {
+        bars.contains { $0.state == .comparing }
+    }
+    
     struct SortingBar: Identifiable {
         let id = UUID()
         var value: Int

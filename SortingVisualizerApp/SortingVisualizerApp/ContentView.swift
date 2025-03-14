@@ -31,13 +31,15 @@ struct ContentView: View {
                         Text("Press 'Randomize Array' to start")
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .background(Color.gray.opacity(0.2))
-                            .padding(.horizontal, 5)
+                            .padding(.horizontal, geometry.size.width > geometry.size.height ? 16 : 5)
                     } else {
                         // Calculate the width for each bar to fill the available space
                         // while respecting safe areas
                         GeometryReader { vizGeometry in
                             // Calculate total available width - accounting for safe areas
-                            let availableWidth = vizGeometry.size.width - safeAreaInsets.leading - safeAreaInsets.trailing
+                            // We want the visualization to align with the actual content of the control panel
+                            // not including its padding
+                            let availableWidth = vizGeometry.size.width - (safeAreaInsets.leading)/4 - (safeAreaInsets.trailing)/4
                             let barCount = viewModel.bars.count
                             
                             // Use smaller spacing for more bars to maximize space usage
@@ -73,7 +75,7 @@ struct ContentView: View {
                             // Center the visualization in the available space
                             .position(x: vizGeometry.size.width / 2, y: vizGeometry.size.height / 2)
                         }
-                        // Remove horizontal padding to maximize width
+                        // Remove padding so bars span the full width
                         .padding(.horizontal, 0)
                     }
                     
@@ -97,7 +99,7 @@ struct ContentView: View {
                             },
                             isSorting: viewModel.isSorting
                         )
-                        .padding(.horizontal)
+                        .padding(.horizontal, 0)
                         .padding(.bottom, 5)
                         .background(Color.black.opacity(0.1))
                     } else {
@@ -117,7 +119,7 @@ struct ContentView: View {
                             },
                             isSorting: viewModel.isSorting
                         )
-                        .padding(.horizontal, 5)
+                        .padding(.horizontal, 0)
                         .padding(.bottom, 5)
                         .background(Color.black.opacity(0.1))
                     }

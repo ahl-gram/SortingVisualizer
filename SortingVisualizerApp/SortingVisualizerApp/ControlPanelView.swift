@@ -101,7 +101,8 @@ struct ControlPanelView: View {
                     }
                     .frame(maxWidth: .infinity)
                 }
-                .padding()
+                .padding(.vertical, 10)
+                .padding(.horizontal, 8)
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(10)
             } else {
@@ -184,7 +185,7 @@ struct ControlPanelView: View {
                     }
                     .padding(.top, 10)
                 }
-                .padding()
+                .padding(8)
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(10)
             }
