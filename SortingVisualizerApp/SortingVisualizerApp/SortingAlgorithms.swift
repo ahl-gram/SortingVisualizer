@@ -28,6 +28,113 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
 // Collection of sorting algorithms
 enum SortingAlgorithms {
     
+    // MARK: - Common Parameters Struct
+    struct SortingParams {
+        let animationSpeed: Double
+        let isAudioEnabled: Bool
+        let audioManager: AudioManager
+        let updateBars: ([SortingViewModel.SortingBar]) -> Void
+    }
+    
+    // MARK: - Helper Methods for Visualization
+    
+    /// Calculate delay based on animation speed
+    private static func calculateDelay(animationSpeed: Double) -> UInt64 {
+        let baseDelay: UInt64 = 500_000_000 // 0.5 seconds in nanoseconds
+        return UInt64(Double(baseDelay) / animationSpeed)
+    }
+    
+    /// Set bars to comparing state and play tone
+    private static func highlightBarsForComparison(
+        indexes: [Int],
+        bars: inout [SortingViewModel.SortingBar],
+        params: SortingParams
+    ) async {
+        await MainActor.run {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                for index in indexes {
+                    bars[index].state = .comparing
+                }
+                params.updateBars(bars)
+            }
+            
+            // Play tone for the first bar being compared
+            if params.isAudioEnabled && !indexes.isEmpty {
+                params.audioManager.playTone(forValue: bars[indexes[0]].value)
+            }
+        }
+        
+        // If there's a second bar, play its tone after a small delay
+        if indexes.count > 1 && params.isAudioEnabled {
+            try? await Task.sleep(nanoseconds: calculateDelay(animationSpeed: params.animationSpeed))
+            
+            await MainActor.run {
+                params.audioManager.playTone(forValue: bars[indexes[1]].value)
+            }
+        }
+    }
+    
+    /// Reset bars to unsorted state
+    private static func resetBarsToUnsorted(
+        indexes: [Int],
+        bars: inout [SortingViewModel.SortingBar],
+        params: SortingParams,
+        exceptFor exceptIndexes: [Int] = []
+    ) async {
+        await MainActor.run {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                for index in indexes where !exceptIndexes.contains(index) {
+                    bars[index].state = .unsorted
+                }
+                params.updateBars(bars)
+            }
+        }
+    }
+    
+    /// Mark bars as sorted
+    private static func markBarsAsSorted(
+        indexes: [Int],
+        bars: inout [SortingViewModel.SortingBar],
+        params: SortingParams
+    ) async {
+        await MainActor.run {
+            withAnimation(.easeInOut(duration: 0.5)) {
+                for index in indexes {
+                    bars[index].state = .sorted
+                }
+                params.updateBars(bars)
+            }
+            
+            // Play a higher tone for sorted element
+            if params.isAudioEnabled {
+                params.audioManager.playTone(forValue: 200) // High tone for sorted elements
+            }
+        }
+    }
+    
+    /// Swap two bars with animation
+    private static func swapBars(
+        index1: Int,
+        index2: Int,
+        bars: inout [SortingViewModel.SortingBar],
+        params: SortingParams
+    ) async {
+        await MainActor.run {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                let temp = bars[index1]
+                bars[index1] = bars[index2]
+                bars[index2] = temp
+                params.updateBars(bars)
+            }
+            
+            if params.isAudioEnabled {
+                params.audioManager.playTone(forValue: bars[index1].value)
+            }
+        }
+    }
+    
+    // MARK: - Sorting Algorithms
+    
     // Bubble sort implementation
     static func bubbleSort(
         bars: [SortingViewModel.SortingBar],
@@ -42,6 +149,17 @@ enum SortingAlgorithms {
         let n = localBars.count
         var swapped = false
         
+        // Create params tuple for helper methods
+        let params = SortingParams(
+            animationSpeed: animationSpeed,
+            isAudioEnabled: isAudioEnabled,
+            audioManager: audioManager,
+            updateBars: updateBars
+        )
+        
+        // Calculate delay once
+        let scaledDelay = calculateDelay(animationSpeed: animationSpeed)
+        
         for i in 0..<n {
             swapped = false
             
@@ -51,86 +169,45 @@ enum SortingAlgorithms {
                     return
                 }
                 
-                // Animate comparison
-                await MainActor.run {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        localBars[j].state = .comparing
-                        localBars[j + 1].state = .comparing
-                        
-                        // Update the UI inside the animation block for smooth transitions
-                        updateBars(localBars)
-                    }
-                    
-                    // Play tone for the first bar being compared (outside animation block)
-                    if isAudioEnabled {
-                        audioManager.playTone(forValue: localBars[j].value)
-                    }
-                }
+                // Highlight bars being compared
+                await highlightBarsForComparison(
+                    indexes: [j, j + 1],
+                    bars: &localBars,
+                    params: params
+                )
                 
                 // Delay for visualization
-                // Use linear scaling across the entire range (0.1x-20.0x)
-                let baseDelay: UInt64 = 500_000_000 // 0.5 seconds in nanoseconds
-                let scaledDelay = UInt64(Double(baseDelay) / animationSpeed)
-                
                 try? await Task.sleep(nanoseconds: scaledDelay)
-                
-                // Play tone for the second bar being compared
-                await MainActor.run {
-                    if isAudioEnabled {
-                        audioManager.playTone(forValue: localBars[j + 1].value)
-                    }
-                }
                 
                 if localBars[j].value > localBars[j + 1].value {
                     // Swap the elements
-                    await MainActor.run {
-                        // Update the UI with the swapped state using proper animation
-                        // Use withAnimation to ensure the UI updates smoothly with the swap
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            let temp = localBars[j]
-                            localBars[j] = localBars[j + 1]
-                            localBars[j + 1] = temp
-                            
-                            // Update the bars inside the animation block to maintain smoothness
-                            updateBars(localBars)
-                        }
-                    }
+                    await swapBars(
+                        index1: j,
+                        index2: j + 1,
+                        bars: &localBars,
+                        params: params
+                    )
                     
                     swapped = true
                     
                     // Delay for visualization after swap
-                    let swapDelay = scaledDelay // use the same scaled delay calculated above
-                    try? await Task.sleep(nanoseconds: swapDelay)
+                    try? await Task.sleep(nanoseconds: scaledDelay)
                 }
                 
                 // Reset the state of the compared elements
-                await MainActor.run {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        localBars[j].state = .unsorted
-                        if j < n - i - 1 {
-                            localBars[j + 1].state = .unsorted
-                        }
-                        
-                        // Update the UI inside the animation block for smooth transitions
-                        updateBars(localBars)
-                    }
-                }
+                await resetBarsToUnsorted(
+                    indexes: [j, j + 1],
+                    bars: &localBars,
+                    params: params
+                )
             }
             
             // Mark the last element as sorted
-            await MainActor.run {
-                withAnimation(.easeInOut(duration: 0.5)) {
-                    localBars[n - i - 1].state = .sorted
-                    
-                    // Update the UI inside the animation block for smooth transitions
-                    updateBars(localBars)
-                }
-                
-                // Play a higher tone for sorted element (outside animation block)
-                if isAudioEnabled {
-                    audioManager.playTone(forValue: 200) // Play the highest tone for sorted elements
-                }
-            }
+            await markBarsAsSorted(
+                indexes: [n - i - 1],
+                bars: &localBars,
+                params: params
+            )
             
             // If no swapping occurred in this pass, the array is already sorted
             if !swapped {
@@ -157,15 +234,20 @@ enum SortingAlgorithms {
     ) async {
         var localBars = bars
         
+        // Create params tuple for helper methods
+        let params = SortingParams(
+            animationSpeed: animationSpeed,
+            isAudioEnabled: isAudioEnabled,
+            audioManager: audioManager,
+            updateBars: updateBars
+        )
+        
         // Start the recursive quick sort
         await quickSortHelper(
             bars: &localBars,
             low: 0,
             high: localBars.count - 1,
-            animationSpeed: animationSpeed,
-            isAudioEnabled: isAudioEnabled,
-            audioManager: audioManager,
-            updateBars: updateBars
+            params: params
         )
         
         // Mark all elements as sorted and show completion animation
@@ -180,10 +262,7 @@ enum SortingAlgorithms {
         bars: inout [SortingViewModel.SortingBar],
         low: Int,
         high: Int,
-        animationSpeed: Double,
-        isAudioEnabled: Bool,
-        audioManager: AudioManager,
-        updateBars: @escaping ([SortingViewModel.SortingBar]) -> Void
+        params: SortingParams
     ) async {
         // Check for task cancellation
         if Task.isCancelled {
@@ -193,16 +272,11 @@ enum SortingAlgorithms {
         // Base case: If there's one element or fewer, the segment is already sorted
         if low >= high {
             // Mark this element as sorted
-            await MainActor.run {
-                withAnimation(.easeInOut(duration: 0.5)) {
-                    bars[low].state = .sorted
-                    updateBars(bars)
-                }
-                
-                if isAudioEnabled {
-                    audioManager.playTone(forValue: 200)
-                }
-            }
+            await markBarsAsSorted(
+                indexes: [low],
+                bars: &bars,
+                params: params
+            )
             return
         }
         
@@ -211,23 +285,15 @@ enum SortingAlgorithms {
             bars: &bars,
             low: low,
             high: high,
-            animationSpeed: animationSpeed,
-            isAudioEnabled: isAudioEnabled,
-            audioManager: audioManager,
-            updateBars: updateBars
+            params: params
         )
         
         // Mark the pivot as sorted
-        await MainActor.run {
-            withAnimation(.easeInOut(duration: 0.5)) {
-                bars[pivotIndex].state = .sorted
-                updateBars(bars)
-            }
-            
-            if isAudioEnabled {
-                audioManager.playTone(forValue: 200)
-            }
-        }
+        await markBarsAsSorted(
+            indexes: [pivotIndex],
+            bars: &bars,
+            params: params
+        )
         
         // Recursively sort the sub-arrays
         if pivotIndex > low {
@@ -235,10 +301,7 @@ enum SortingAlgorithms {
                 bars: &bars,
                 low: low,
                 high: pivotIndex - 1,
-                animationSpeed: animationSpeed,
-                isAudioEnabled: isAudioEnabled,
-                audioManager: audioManager,
-                updateBars: updateBars
+                params: params
             )
         }
         
@@ -247,10 +310,7 @@ enum SortingAlgorithms {
                 bars: &bars,
                 low: pivotIndex + 1,
                 high: high,
-                animationSpeed: animationSpeed,
-                isAudioEnabled: isAudioEnabled,
-                audioManager: audioManager,
-                updateBars: updateBars
+                params: params
             )
         }
     }
@@ -260,29 +320,20 @@ enum SortingAlgorithms {
         bars: inout [SortingViewModel.SortingBar],
         low: Int,
         high: Int,
-        animationSpeed: Double,
-        isAudioEnabled: Bool,
-        audioManager: AudioManager,
-        updateBars: @escaping ([SortingViewModel.SortingBar]) -> Void
+        params: SortingParams
     ) async -> Int {
         // Choose the rightmost element as pivot
         let pivot = bars[high].value
         
         // Highlight the pivot
-        await MainActor.run {
-            withAnimation(.easeInOut(duration: 0.3)) {
-                bars[high].state = .comparing
-                updateBars(bars)
-            }
-            
-            if isAudioEnabled {
-                audioManager.playTone(forValue: bars[high].value)
-            }
-        }
+        await highlightBarsForComparison(
+            indexes: [high],
+            bars: &bars,
+            params: params
+        )
         
         // Delay for visualization
-        let baseDelay: UInt64 = 500_000_000 // 0.5 seconds in nanoseconds
-        let scaledDelay = UInt64(Double(baseDelay) / animationSpeed)
+        let scaledDelay = calculateDelay(animationSpeed: params.animationSpeed)
         try? await Task.sleep(nanoseconds: scaledDelay)
         
         // Index of smaller element
@@ -297,16 +348,11 @@ enum SortingAlgorithms {
             }
             
             // Highlight the current element being compared
-            await MainActor.run {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    bars[j].state = .comparing
-                    updateBars(bars)
-                }
-                
-                if isAudioEnabled {
-                    audioManager.playTone(forValue: bars[j].value)
-                }
-            }
+            await highlightBarsForComparison(
+                indexes: [j],
+                bars: &bars,
+                params: params
+            )
             
             // Delay for visualization
             try? await Task.sleep(nanoseconds: scaledDelay)
@@ -317,58 +363,50 @@ enum SortingAlgorithms {
                 i += 1
                 
                 // Swap elements
-                await MainActor.run {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                        let temp = bars[i]
-                        bars[i] = bars[j]
-                        bars[j] = temp
-                        updateBars(bars)
-                    }
-                    
-                    if isAudioEnabled {
-                        audioManager.playTone(forValue: bars[i].value)
-                    }
-                }
+                await swapBars(
+                    index1: i,
+                    index2: j,
+                    bars: &bars,
+                    params: params
+                )
                 
                 // Delay for visualization after swap
                 try? await Task.sleep(nanoseconds: scaledDelay)
             }
             
             // Reset the state of the compared element
-            await MainActor.run {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    bars[j].state = .unsorted
-                    if i >= low {
-                        bars[i].state = .unsorted
-                    }
-                    updateBars(bars)
-                }
+            await resetBarsToUnsorted(
+                indexes: [j],  // Only include j, which is guaranteed to be valid
+                bars: &bars,
+                params: params
+            )
+            
+            // Only reset i if it's a valid index
+            if i >= low {
+                await resetBarsToUnsorted(
+                    indexes: [i],
+                    bars: &bars,
+                    params: params
+                )
             }
         }
         
         // Reset the pivot state before final swap
-        await MainActor.run {
-            withAnimation(.easeInOut(duration: 0.3)) {
-                bars[high].state = .unsorted
-                updateBars(bars)
-            }
-        }
+        await resetBarsToUnsorted(
+            indexes: [high],
+            bars: &bars,
+            params: params
+        )
         
         // Swap the pivot element with the element at (i+1)
         // This puts the pivot in its correct sorted position
         i += 1
-        await MainActor.run {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                let temp = bars[i]
-                bars[i] = bars[high]
-                bars[high] = temp
-                updateBars(bars)
-            }
-            
-            if isAudioEnabled {
-                audioManager.playTone(forValue: bars[i].value)
-            }
-        }
+        await swapBars(
+            index1: i,
+            index2: high,
+            bars: &bars,
+            params: params
+        )
         
         // Delay for visualization after final swap
         try? await Task.sleep(nanoseconds: scaledDelay)
