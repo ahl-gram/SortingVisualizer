@@ -46,7 +46,7 @@ struct ControlPanelView: View {
                                 .frame(width: 40, alignment: .trailing)
                         }
                         
-                        Slider(value: $animationSpeed, in: 0.1...5.0, step: 0.1)
+                        Slider(value: $animationSpeed, in: 0.1...20.0, step: 0.1)
                             .accessibilityLabel("Animation Speed Slider")
                     }
                     .frame(maxWidth: .infinity)
@@ -134,7 +134,7 @@ struct ControlPanelView: View {
                             .frame(width: 40, alignment: .trailing)
                     }
                     
-                    Slider(value: $animationSpeed, in: 0.1...5.0, step: 0.1)
+                    Slider(value: $animationSpeed, in: 0.1...20.0, step: 0.1)
                         .padding(.vertical, 5)
                         .accessibilityLabel("Animation Speed Slider")
                         .accessibilityHint("Adjust to change the speed of the sorting animation")

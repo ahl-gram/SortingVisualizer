@@ -39,92 +39,60 @@ class SortingViewModel: ObservableObject {
         // Reset completion animation flag
         showCompletionAnimation = false
         
-        // Generate a new array of random values
+        // Generate a new array of bars with unique, uniformly distributed heights
         var newBars: [SortingBar] = []
         
         // Define height parameters
         let minHeight = 10
         
-        // Use higher maximum heights overall to better utilize vertical space
-        // Even with many bars, we want significant height differences
+        // Set maximum height based on array size
         let maxHeight: Int
         switch size {
         case 10...30:
-            maxHeight = 500  // Maximum height for small arrays - increased for more dramatic effect
+            maxHeight = 500
         case 31...60:
-            maxHeight = 450  // Medium-sized arrays - higher than before
+            maxHeight = 450
         default:
-            maxHeight = 400  // Large arrays - significantly higher than before
+            maxHeight = 400
         }
         
-        // For larger arrays, ensure better distribution across the full height range
-        if size > 50 {
-            // Create a statistical distribution that favors varied heights
+        // Calculate the range of heights
+        let heightRange = maxHeight - minHeight
+        
+        // Generate a sequence of uniformly distributed heights
+        // by dividing the height range into equal steps
+        var heights: [Int] = []
+        
+        // If the array size is small, we can use the exact step size to get perfect distribution
+        if size <= heightRange {
+            // Calculate step size to evenly distribute heights
+            let step = heightRange / (size - 1)
             
-            // Add a bar with maximum height to ensure we use the full height
-            newBars.append(SortingBar(value: maxHeight))
-            
-            // Add a bar with minimum height
-            newBars.append(SortingBar(value: minHeight))
-            
-            // Add some bars in the upper range (top 25%)
-            let upperQuartile = maxHeight - (maxHeight - minHeight) / 4
-            for _ in 0..<max(3, size / 20) {
-                let value = Int.random(in: upperQuartile...maxHeight)
-                newBars.append(SortingBar(value: value))
-            }
-            
-            // Add some bars in the lower range (bottom 25%)
-            let lowerQuartile = minHeight + (maxHeight - minHeight) / 4
-            for _ in 0..<max(3, size / 20) {
-                let value = Int.random(in: minHeight...lowerQuartile)
-                newBars.append(SortingBar(value: value))
-            }
-            
-            // Fill the rest with a wider distribution
-            // Use a curve that creates more variety
-            for _ in 0..<(size - newBars.count) {
-                // Use biased randomization to create more variety
-                let bias = Double.random(in: 0.0...1.0)
-                let biasedRandom: Int
-                
-                if bias < 0.5 {
-                    // Bias toward lower values with some medium ones
-                    biasedRandom = Int.random(in: minHeight...(minHeight + (maxHeight - minHeight) / 2))
-                } else if bias < 0.8 {
-                    // Some middle range values
-                    biasedRandom = Int.random(in: (minHeight + (maxHeight - minHeight) / 3)...(minHeight + 2 * (maxHeight - minHeight) / 3))
-                } else {
-                    // Some higher values
-                    biasedRandom = Int.random(in: (minHeight + 2 * (maxHeight - minHeight) / 3)...maxHeight)
-                }
-                
-                newBars.append(SortingBar(value: biasedRandom))
+            // Generate heights with uniform distribution
+            for i in 0..<size {
+                heights.append(minHeight + (i * step))
             }
         } else {
-            // For smaller arrays, ensure we have full range coverage
-            // Add a bar with maximum height
-            newBars.append(SortingBar(value: maxHeight))
+            // When we have more bars than the height range, we need to ensure uniqueness
+            // by generating all possible heights and then sampling from them
             
-            // Add a bar with minimum height
-            newBars.append(SortingBar(value: minHeight))
+            // Generate all possible heights in the range
+            var allPossibleHeights = Array(minHeight...maxHeight)
             
-            // Add a few bars at different quartiles to ensure good distribution
-            if size > 15 {
-                newBars.append(SortingBar(value: minHeight + (maxHeight - minHeight) / 4))  // Q1
-                newBars.append(SortingBar(value: minHeight + (maxHeight - minHeight) / 2))  // Q2 (median)
-                newBars.append(SortingBar(value: minHeight + 3 * (maxHeight - minHeight) / 4)) // Q3
-            }
+            // Shuffle the heights to randomize selection
+            allPossibleHeights.shuffle()
             
-            // Fill the rest with random heights
-            for _ in 0..<(size - newBars.count) {
-                let randomValue = Int.random(in: minHeight...maxHeight)
-                newBars.append(SortingBar(value: randomValue))
-            }
+            // Select 'size' number of unique heights
+            heights = Array(allPossibleHeights.prefix(size))
         }
         
-        // Shuffle the array to randomize the positions
-        newBars.shuffle()
+        // Shuffle the heights for final randomization
+        heights.shuffle()
+        
+        // Create bars with the unique heights
+        for height in heights {
+            newBars.append(SortingBar(value: height))
+        }
         
         // Update the bars array
         withAnimation {
@@ -187,7 +155,11 @@ class SortingViewModel: ObservableObject {
                 }
                 
                 // Delay for visualization
-                try? await Task.sleep(nanoseconds: UInt64(500_000_000 / animationSpeed))
+                // Use linear scaling across the entire range (0.1x-20.0x)
+                let baseDelay: UInt64 = 500_000_000 // 0.5 seconds in nanoseconds
+                let scaledDelay = UInt64(Double(baseDelay) / animationSpeed)
+                
+                try? await Task.sleep(nanoseconds: scaledDelay)
                 
                 // Play tone for the second bar being compared
                 await MainActor.run {
@@ -208,8 +180,9 @@ class SortingViewModel: ObservableObject {
                     
                     swapped = true
                     
-                    // Delay for visualization
-                    try? await Task.sleep(nanoseconds: UInt64(500_000_000 / animationSpeed))
+                    // Delay for visualization after swap
+                    let swapDelay = scaledDelay // use the same scaled delay calculated above
+                    try? await Task.sleep(nanoseconds: swapDelay)
                 }
                 
                 // Reset the state of the compared elements

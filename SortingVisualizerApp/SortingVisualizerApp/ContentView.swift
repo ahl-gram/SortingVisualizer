@@ -198,7 +198,7 @@ struct CompactControlPanelView: View {
                 HStack {
                     Text("Speed: \(String(format: "%.1f", animationSpeed))x")
                         .font(.caption)
-                    Slider(value: $animationSpeed, in: 0.1...5.0, step: 0.1)
+                    Slider(value: $animationSpeed, in: 0.1...20.0, step: 0.1)
                 }
             }
             
