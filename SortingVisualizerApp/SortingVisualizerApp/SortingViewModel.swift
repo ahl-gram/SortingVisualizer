@@ -150,6 +150,23 @@ class SortingViewModel: ObservableObject {
                         self?.isSorting = false
                     }
                 )
+            case .merge:
+                await SortingAlgorithms.mergeSort(
+                    bars: bars,
+                    animationSpeed: animationSpeed,
+                    isAudioEnabled: isAudioEnabled,
+                    audioManager: audioManager,
+                    updateBars: { [weak self] updatedBars in
+                        self?.bars = updatedBars
+                    },
+                    markAllAsSorted: { [weak self] in
+                        self?.markAllAsSorted()
+                    },
+                    onComplete: { [weak self] in
+                        self?.showCompletionAnimation = true
+                        self?.isSorting = false
+                    }
+                )
             }
         }
     }

@@ -12,6 +12,7 @@ import SwiftUI
 enum SortingAlgorithmType: String, CaseIterable, Identifiable {
     case bubble = "Bubble Sort"
     case quick = "Quick Sort"
+    case merge = "Merge Sort"
     
     var id: String { self.rawValue }
     
@@ -21,6 +22,8 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
             return "A simple comparison-based algorithm that repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order."
         case .quick:
             return "A divide-and-conquer algorithm that works by selecting a 'pivot' element and partitioning the array around the pivot."
+        case .merge:
+            return "An efficient, stable, divide-and-conquer algorithm that divides the array into halves, sorts them separately, and then merges the sorted halves."
         }
     }
 }
@@ -133,6 +136,135 @@ enum SortingAlgorithms {
         }
     }
     
+    // MARK: - Process Sorting Step
+    
+    /// Process a sorting step and apply visualization
+    private static func processSortingStep(
+        step: SortingLogic.SortingStep<Int>,
+        bars: inout [SortingViewModel.SortingBar],
+        params: SortingParams,
+        markAllAsSorted: @escaping () -> Void,
+        onComplete: @escaping () -> Void,
+        scaledDelay: UInt64
+    ) async -> Bool {
+        // Check for task cancellation
+        if Task.isCancelled {
+            return false
+        }
+        
+        switch step {
+        case .compare(let index1, let index2):
+            // Highlight bars being compared
+            await highlightBarsForComparison(
+                indexes: [index1, index2],
+                bars: &bars,
+                params: params
+            )
+            
+            // Delay for visualization
+            try? await Task.sleep(nanoseconds: scaledDelay)
+            
+            // Reset to unsorted state after comparison
+            if index1 != index2 { // Skip resetting for pivot self-comparison
+                await resetBarsToUnsorted(
+                    indexes: [index1, index2],
+                    bars: &bars,
+                    params: params
+                )
+            }
+            
+            return true
+            
+        case .swap(let index1, let index2):
+            // Check if this is a direct update (self-swap) used by merge sort
+            if index1 == index2 {
+                // This is a direct update, not a swap
+                // Simply update the UI without swap animation
+                await MainActor.run {
+                    // Use a simpler animation for direct updates
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        params.updateBars(bars)
+                    }
+                    
+                    if params.isAudioEnabled {
+                        params.audioManager.playTone(forValue: bars[index1].value)
+                    }
+                }
+            } else {
+                // This is a regular swap
+                await swapBars(
+                    index1: index1,
+                    index2: index2,
+                    bars: &bars,
+                    params: params
+                )
+            }
+            
+            // Delay for visualization after swap
+            try? await Task.sleep(nanoseconds: scaledDelay)
+            
+            return true
+            
+        case .merge(let index, let newValue):
+            // This is a special case for merge sort
+            // First mark the bar as being merged
+            await MainActor.run {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    bars[index].state = .merging
+                    params.updateBars(bars)
+                }
+            }
+            
+            // Short delay for visual effect
+            try? await Task.sleep(nanoseconds: scaledDelay / 3)
+            
+            // Update the bar value with a smooth animation
+            await MainActor.run {
+                // Use a distinct animation for merging that's visually different from swapping
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                    bars[index].value = newValue
+                    params.updateBars(bars)
+                }
+                
+                if params.isAudioEnabled {
+                    params.audioManager.playTone(forValue: bars[index].value)
+                }
+            }
+            
+            // Another short delay
+            try? await Task.sleep(nanoseconds: scaledDelay / 2)
+            
+            // Reset the bar state to unsorted after merging
+            await MainActor.run {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    bars[index].state = .unsorted
+                    params.updateBars(bars)
+                }
+            }
+            
+            return true
+            
+        case .markSorted(let index):
+            // Mark the element as sorted
+            await markBarsAsSorted(
+                indexes: [index],
+                bars: &bars,
+                params: params
+            )
+            
+            return true
+            
+        case .completed:
+            // Mark all remaining elements as sorted and show completion animation
+            await MainActor.run {
+                markAllAsSorted()
+                onComplete()
+            }
+            
+            return false
+        }
+    }
+    
     // MARK: - Sorting Algorithms
     
     // Bubble sort implementation
@@ -146,10 +278,8 @@ enum SortingAlgorithms {
         onComplete: @escaping () -> Void
     ) async {
         var localBars = bars
-        let n = localBars.count
-        var swapped = false
         
-        // Create params tuple for helper methods
+        // Create params struct for helper methods
         let params = SortingParams(
             animationSpeed: animationSpeed,
             isAudioEnabled: isAudioEnabled,
@@ -160,65 +290,19 @@ enum SortingAlgorithms {
         // Calculate delay once
         let scaledDelay = calculateDelay(animationSpeed: animationSpeed)
         
-        for i in 0..<n {
-            swapped = false
-            
-            for j in 0..<n - i - 1 {
-                // Check if the task was cancelled
-                if Task.isCancelled {
-                    return
-                }
-                
-                // Highlight bars being compared
-                await highlightBarsForComparison(
-                    indexes: [j, j + 1],
-                    bars: &localBars,
-                    params: params
-                )
-                
-                // Delay for visualization
-                try? await Task.sleep(nanoseconds: scaledDelay)
-                
-                if localBars[j].value > localBars[j + 1].value {
-                    // Swap the elements
-                    await swapBars(
-                        index1: j,
-                        index2: j + 1,
-                        bars: &localBars,
-                        params: params
-                    )
-                    
-                    swapped = true
-                    
-                    // Delay for visualization after swap
-                    try? await Task.sleep(nanoseconds: scaledDelay)
-                }
-                
-                // Reset the state of the compared elements
-                await resetBarsToUnsorted(
-                    indexes: [j, j + 1],
-                    bars: &localBars,
-                    params: params
-                )
-            }
-            
-            // Mark the last element as sorted
-            await markBarsAsSorted(
-                indexes: [n - i - 1],
-                bars: &localBars,
-                params: params
-            )
-            
-            // If no swapping occurred in this pass, the array is already sorted
-            if !swapped {
-                break
-            }
-        }
+        // Extract bar values for sorting
+        let values = localBars.map { $0.value }
         
-        // Mark all remaining elements as sorted and show completion animation
-        await MainActor.run {
-            markAllAsSorted()
-            onComplete()
+        // Run the pure sorting algorithm with visualization steps
+        _ = await SortingLogic.bubbleSort(array: values) { step, _ in
+            await processSortingStep(
+                step: step,
+                bars: &localBars,
+                params: params,
+                markAllAsSorted: markAllAsSorted,
+                onComplete: onComplete,
+                scaledDelay: scaledDelay
+            )
         }
     }
     
@@ -234,7 +318,7 @@ enum SortingAlgorithms {
     ) async {
         var localBars = bars
         
-        // Create params tuple for helper methods
+        // Create params struct for helper methods
         let params = SortingParams(
             animationSpeed: animationSpeed,
             isAudioEnabled: isAudioEnabled,
@@ -242,175 +326,77 @@ enum SortingAlgorithms {
             updateBars: updateBars
         )
         
-        // Start the recursive quick sort
-        await quickSortHelper(
-            bars: &localBars,
-            low: 0,
-            high: localBars.count - 1,
-            params: params
+        // Calculate delay once
+        let scaledDelay = calculateDelay(animationSpeed: animationSpeed)
+        
+        // Extract bar values for sorting
+        let values = localBars.map { $0.value }
+        
+        // Run the pure sorting algorithm with visualization steps
+        _ = await SortingLogic.quickSort(array: values) { step, _ in
+            await processSortingStep(
+                step: step,
+                bars: &localBars,
+                params: params,
+                markAllAsSorted: markAllAsSorted,
+                onComplete: onComplete,
+                scaledDelay: scaledDelay
+            )
+        }
+    }
+    
+    // Merge sort implementation
+    static func mergeSort(
+        bars: [SortingViewModel.SortingBar],
+        animationSpeed: Double,
+        isAudioEnabled: Bool,
+        audioManager: AudioManager,
+        updateBars: @escaping ([SortingViewModel.SortingBar]) -> Void,
+        markAllAsSorted: @escaping () -> Void,
+        onComplete: @escaping () -> Void
+    ) async {
+        var localBars = bars
+        
+        // Create params struct for helper methods
+        let params = SortingParams(
+            animationSpeed: animationSpeed,
+            isAudioEnabled: isAudioEnabled,
+            audioManager: audioManager,
+            updateBars: updateBars
         )
         
-        // Mark all elements as sorted and show completion animation
+        // Calculate delay once
+        let scaledDelay = calculateDelay(animationSpeed: animationSpeed)
+        
+        // Extract bar values for sorting
+        let values = localBars.map { $0.value }
+        
+        // Run the pure sorting algorithm with visualization steps
+        let sortedValues = await SortingLogic.mergeSort(array: values) { step, currentArray in
+            // For each step, ensure the visual bars array has the same values as the algorithm array
+            if case .merge(let index, let newValue) = step {
+                // For merge operations, explicitly update the bar's value
+                localBars[index].value = newValue
+            }
+            
+            return await processSortingStep(
+                step: step,
+                bars: &localBars,
+                params: params,
+                markAllAsSorted: markAllAsSorted,
+                onComplete: onComplete,
+                scaledDelay: scaledDelay
+            )
+        }
+        
+        // Ensure the bars array is correctly sorted at the end
         await MainActor.run {
+            for i in 0..<min(localBars.count, sortedValues.count) {
+                localBars[i].value = sortedValues[i]
+            }
+            updateBars(localBars)
             markAllAsSorted()
             onComplete()
         }
-    }
-    
-    // Helper method for the quicksort algorithm
-    private static func quickSortHelper(
-        bars: inout [SortingViewModel.SortingBar],
-        low: Int,
-        high: Int,
-        params: SortingParams
-    ) async {
-        // Check for task cancellation
-        if Task.isCancelled {
-            return
-        }
-        
-        // Base case: If there's one element or fewer, the segment is already sorted
-        if low >= high {
-            // Mark this element as sorted
-            await markBarsAsSorted(
-                indexes: [low],
-                bars: &bars,
-                params: params
-            )
-            return
-        }
-        
-        // Partition the array and get the pivot index
-        let pivotIndex = await partition(
-            bars: &bars,
-            low: low,
-            high: high,
-            params: params
-        )
-        
-        // Mark the pivot as sorted
-        await markBarsAsSorted(
-            indexes: [pivotIndex],
-            bars: &bars,
-            params: params
-        )
-        
-        // Recursively sort the sub-arrays
-        if pivotIndex > low {
-            await quickSortHelper(
-                bars: &bars,
-                low: low,
-                high: pivotIndex - 1,
-                params: params
-            )
-        }
-        
-        if pivotIndex < high {
-            await quickSortHelper(
-                bars: &bars,
-                low: pivotIndex + 1,
-                high: high,
-                params: params
-            )
-        }
-    }
-    
-    // Partition function for quicksort
-    private static func partition(
-        bars: inout [SortingViewModel.SortingBar],
-        low: Int,
-        high: Int,
-        params: SortingParams
-    ) async -> Int {
-        // Choose the rightmost element as pivot
-        let pivot = bars[high].value
-        
-        // Highlight the pivot
-        await highlightBarsForComparison(
-            indexes: [high],
-            bars: &bars,
-            params: params
-        )
-        
-        // Delay for visualization
-        let scaledDelay = calculateDelay(animationSpeed: params.animationSpeed)
-        try? await Task.sleep(nanoseconds: scaledDelay)
-        
-        // Index of smaller element
-        var i = low - 1
-        
-        // Traverse through all elements
-        // compare each element with pivot
-        for j in low..<high {
-            // Check for task cancellation
-            if Task.isCancelled {
-                break
-            }
-            
-            // Highlight the current element being compared
-            await highlightBarsForComparison(
-                indexes: [j],
-                bars: &bars,
-                params: params
-            )
-            
-            // Delay for visualization
-            try? await Task.sleep(nanoseconds: scaledDelay)
-            
-            // If current element is smaller than the pivot
-            if bars[j].value < pivot {
-                // Increment index of smaller element
-                i += 1
-                
-                // Swap elements
-                await swapBars(
-                    index1: i,
-                    index2: j,
-                    bars: &bars,
-                    params: params
-                )
-                
-                // Delay for visualization after swap
-                try? await Task.sleep(nanoseconds: scaledDelay)
-            }
-            
-            // Reset the state of the compared element
-            await resetBarsToUnsorted(
-                indexes: [j],  // Only include j, which is guaranteed to be valid
-                bars: &bars,
-                params: params
-            )
-            
-            // Only reset i if it's a valid index
-            if i >= low {
-                await resetBarsToUnsorted(
-                    indexes: [i],
-                    bars: &bars,
-                    params: params
-                )
-            }
-        }
-        
-        // Reset the pivot state before final swap
-        await resetBarsToUnsorted(
-            indexes: [high],
-            bars: &bars,
-            params: params
-        )
-        
-        // Swap the pivot element with the element at (i+1)
-        // This puts the pivot in its correct sorted position
-        i += 1
-        await swapBars(
-            index1: i,
-            index2: high,
-            bars: &bars,
-            params: params
-        )
-        
-        // Delay for visualization after final swap
-        try? await Task.sleep(nanoseconds: scaledDelay)
-        
-        return i // Return the pivot's position
     }
 } 

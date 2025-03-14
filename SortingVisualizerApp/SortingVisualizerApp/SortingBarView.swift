@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum BarState {
-    case unsorted, comparing, sorted
+    case unsorted, comparing, sorted, merging
 }
 
 struct SortingBarView: View {
@@ -56,6 +56,12 @@ struct SortingBarView: View {
                 startPoint: .leading,
                 endPoint: .trailing
             )
+        case .merging:
+            return LinearGradient(
+                gradient: Gradient(colors: [Color.purple.opacity(0.7), Color.purple]),
+                startPoint: .leading,
+                endPoint: .trailing
+            )
         }
     }
     
@@ -64,6 +70,7 @@ struct SortingBarView: View {
         case .unsorted: return Color.white
         case .comparing: return Color.green
         case .sorted: return Color.cyan
+        case .merging: return Color.purple
         }
     }
     
@@ -72,6 +79,7 @@ struct SortingBarView: View {
         case .unsorted: return Color.clear
         case .comparing: return Color.green.opacity(0.7)
         case .sorted: return Color.cyan.opacity(0.3)
+        case .merging: return Color.purple.opacity(0.7)
         }
     }
 }
@@ -81,6 +89,7 @@ struct SortingBarView: View {
         SortingBarView(height: 50, state: .unsorted, width: 10)
         SortingBarView(height: 100, state: .comparing, width: 15)
         SortingBarView(height: 150, state: .sorted, width: 20)
+        SortingBarView(height: 120, state: .merging, width: 15)
     }
     .background(Color.black)
 } 
