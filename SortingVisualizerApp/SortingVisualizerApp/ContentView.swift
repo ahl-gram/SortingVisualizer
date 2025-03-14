@@ -88,31 +88,35 @@ struct ContentView: View {
                             arraySize: $arraySize,
                             animationSpeed: $animationSpeed,
                             isAudioEnabled: $viewModel.isAudioEnabled,
+                            selectedAlgorithm: $viewModel.selectedAlgorithm,
                             onRandomize: {
                                 viewModel.randomizeArray(size: Int(arraySize))
                             },
                             onStartSorting: {
-                                viewModel.startBubbleSort(animationSpeed: animationSpeed)
+                                viewModel.startSorting(animationSpeed: animationSpeed)
                             },
                             onStopSorting: {
                                 viewModel.stopSorting()
                             },
                             isSorting: viewModel.isSorting
                         )
-                        .padding(.horizontal, 0)
+                        .padding(.horizontal, 5)
                         .padding(.bottom, 5)
                         .background(Color.black.opacity(0.1))
+                        // Set minimum height for the control panel to ensure all controls are visible
+                        .frame(minHeight: 180)
                     } else {
                         // Portrait mode - more compact control panel
                         CompactControlPanelView(
                             arraySize: $arraySize,
                             animationSpeed: $animationSpeed,
                             isAudioEnabled: $viewModel.isAudioEnabled,
+                            selectedAlgorithm: $viewModel.selectedAlgorithm,
                             onRandomize: {
                                 viewModel.randomizeArray(size: Int(arraySize))
                             },
                             onStartSorting: {
-                                viewModel.startBubbleSort(animationSpeed: animationSpeed)
+                                viewModel.startSorting(animationSpeed: animationSpeed)
                             },
                             onStopSorting: {
                                 viewModel.stopSorting()
@@ -164,6 +168,7 @@ struct CompactControlPanelView: View {
     @Binding var arraySize: Double
     @Binding var animationSpeed: Double
     @Binding var isAudioEnabled: Bool
+    @Binding var selectedAlgorithm: SortingAlgorithmType
     var onRandomize: () -> Void
     var onStartSorting: () -> Void
     var onStopSorting: () -> Void
@@ -171,7 +176,7 @@ struct CompactControlPanelView: View {
     
     var body: some View {
         VStack(spacing: 5) {
-            // Controls label and toggles in one row
+            // Top row with controls label and audio toggle
             HStack {
                 Text("Controls")
                     .font(.headline)
@@ -186,20 +191,37 @@ struct CompactControlPanelView: View {
                 .toggleStyle(SwitchToggleStyle(tint: .blue))
             }
             
-            // Array Size and Animation Speed sliders in more compact form
-            VStack(spacing: 2) {
-                HStack {
-                    Text("Array Size: \(Int(arraySize))")
-                        .font(.caption)
-                    Slider(value: $arraySize, in: 10...100, step: 1)
-                        .disabled(isSorting)
-                }
+            // Algorithm picker
+            HStack {
+                Text("Algorithm:")
+                    .font(.caption)
                 
-                HStack {
-                    Text("Speed: \(String(format: "%.1f", animationSpeed))x")
-                        .font(.caption)
-                    Slider(value: $animationSpeed, in: 0.1...20.0, step: 0.1)
+                Picker("Algorithm", selection: $selectedAlgorithm) {
+                    ForEach(SortingAlgorithmType.allCases) { algorithm in
+                        Text(algorithm.rawValue).tag(algorithm)
+                    }
                 }
+                .pickerStyle(SegmentedPickerStyle())
+                .disabled(isSorting)
+                .frame(maxWidth: .infinity)
+            }
+            .padding(.vertical, 2)
+            
+            // Array Size slider
+            HStack {
+                Text("Size: \(Int(arraySize))")
+                    .font(.caption)
+                    .frame(width: 55, alignment: .leading)
+                Slider(value: $arraySize, in: 10...100, step: 1)
+                    .disabled(isSorting)
+            }
+            
+            // Animation Speed slider
+            HStack {
+                Text("Speed: \(String(format: "%.1f", animationSpeed))x")
+                    .font(.caption)
+                    .frame(width: 55, alignment: .leading)
+                Slider(value: $animationSpeed, in: 0.1...20.0, step: 0.1)
             }
             
             // Buttons in a row

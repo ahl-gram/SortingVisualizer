@@ -17,6 +17,7 @@ class SortingViewModel: ObservableObject {
         }
     }
     @Published var showCompletionAnimation: Bool = false
+    @Published var selectedAlgorithm: SortingAlgorithmType = .bubble
     
     // MARK: - Private properties
     private var sortingTask: Task<Void, Never>?
@@ -102,7 +103,7 @@ class SortingViewModel: ObservableObject {
         }
     }
     
-    func startBubbleSort(animationSpeed: Double) {
+    func startSorting(animationSpeed: Double) {
         // Cancel any existing sorting task
         stopSorting()
         
@@ -112,24 +113,44 @@ class SortingViewModel: ObservableObject {
         // Set sorting flag
         isSorting = true
         
-        // Start a new sorting task
+        // Start a new sorting task based on selected algorithm
         sortingTask = Task {
-            await SortingAlgorithms.bubbleSort(
-                bars: bars,
-                animationSpeed: animationSpeed,
-                isAudioEnabled: isAudioEnabled,
-                audioManager: audioManager,
-                updateBars: { [weak self] updatedBars in
-                    self?.bars = updatedBars
-                },
-                markAllAsSorted: { [weak self] in
-                    self?.markAllAsSorted()
-                },
-                onComplete: { [weak self] in
-                    self?.showCompletionAnimation = true
-                    self?.isSorting = false
-                }
-            )
+            switch selectedAlgorithm {
+            case .bubble:
+                await SortingAlgorithms.bubbleSort(
+                    bars: bars,
+                    animationSpeed: animationSpeed,
+                    isAudioEnabled: isAudioEnabled,
+                    audioManager: audioManager,
+                    updateBars: { [weak self] updatedBars in
+                        self?.bars = updatedBars
+                    },
+                    markAllAsSorted: { [weak self] in
+                        self?.markAllAsSorted()
+                    },
+                    onComplete: { [weak self] in
+                        self?.showCompletionAnimation = true
+                        self?.isSorting = false
+                    }
+                )
+            case .quick:
+                await SortingAlgorithms.quickSort(
+                    bars: bars,
+                    animationSpeed: animationSpeed,
+                    isAudioEnabled: isAudioEnabled,
+                    audioManager: audioManager,
+                    updateBars: { [weak self] updatedBars in
+                        self?.bars = updatedBars
+                    },
+                    markAllAsSorted: { [weak self] in
+                        self?.markAllAsSorted()
+                    },
+                    onComplete: { [weak self] in
+                        self?.showCompletionAnimation = true
+                        self?.isSorting = false
+                    }
+                )
+            }
         }
     }
     

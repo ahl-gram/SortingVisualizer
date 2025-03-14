@@ -11,6 +11,7 @@ struct ControlPanelView: View {
     @Binding var arraySize: Double
     @Binding var animationSpeed: Double
     @Binding var isAudioEnabled: Bool
+    @Binding var selectedAlgorithm: SortingAlgorithmType
     var onRandomize: () -> Void
     var onStartSorting: () -> Void
     var onStopSorting: () -> Void
@@ -21,10 +22,24 @@ struct ControlPanelView: View {
             if geometry.size.width > 600 {
                 // Wide landscape layout - horizontal arrangement
                 HStack(alignment: .center, spacing: 15) {
-                    // Left column - sliders
+                    // Left column - sliders and algorithm picker
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Controls")
                             .font(.headline)
+                        
+                        // Algorithm Picker
+                        HStack {
+                            Text("Algorithm:")
+                            Picker("Algorithm", selection: $selectedAlgorithm) {
+                                ForEach(SortingAlgorithmType.allCases) { algorithm in
+                                    Text(algorithm.rawValue).tag(algorithm)
+                                }
+                            }
+                            .pickerStyle(SegmentedPickerStyle())
+                            .disabled(isSorting)
+                            .accessibilityLabel("Algorithm Selector")
+                        }
+                        .padding(.bottom, 5)
                         
                         // Array Size Slider
                         HStack {
@@ -66,7 +81,7 @@ struct ControlPanelView: View {
                             // Randomize Array Button
                             Button(action: onRandomize) {
                                 Text("Randomize Array")
-                                    .padding()
+                                    .padding(.vertical, 8)
                                     .frame(maxWidth: .infinity)
                                     .background(Color.blue)
                                     .foregroundColor(.white)
@@ -79,7 +94,7 @@ struct ControlPanelView: View {
                             if isSorting {
                                 Button(action: onStopSorting) {
                                     Text("Stop Sorting")
-                                        .padding()
+                                        .padding(.vertical, 8)
                                         .frame(maxWidth: .infinity)
                                         .background(Color.red)
                                         .foregroundColor(.white)
@@ -89,7 +104,7 @@ struct ControlPanelView: View {
                             } else {
                                 Button(action: onStartSorting) {
                                     Text("Start Sorting")
-                                        .padding()
+                                        .padding(.vertical, 8)
                                         .frame(maxWidth: .infinity)
                                         .background(Color.green)
                                         .foregroundColor(.white)
@@ -107,10 +122,26 @@ struct ControlPanelView: View {
                 .cornerRadius(10)
             } else {
                 // Standard layout for smaller screens
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text("Controls")
                         .font(.headline)
-                        .padding(.bottom, 5)
+                        .padding(.bottom, 2)
+                    
+                    // Algorithm Picker
+                    HStack {
+                        Text("Algorithm:")
+                        Spacer()
+                        Picker("Algorithm", selection: $selectedAlgorithm) {
+                            ForEach(SortingAlgorithmType.allCases) { algorithm in
+                                Text(algorithm.rawValue).tag(algorithm)
+                            }
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+                        .frame(maxWidth: 240)
+                        .disabled(isSorting)
+                        .accessibilityLabel("Algorithm Selector")
+                    }
+                    .padding(.vertical, 2)
                     
                     // Array Size Slider
                     HStack {
@@ -121,7 +152,7 @@ struct ControlPanelView: View {
                     }
                     
                     Slider(value: $arraySize, in: 10...100, step: 1)
-                        .padding(.vertical, 5)
+                        .padding(.vertical, 2)
                         .accessibilityLabel("Array Size Slider")
                         .accessibilityHint("Adjust to change the number of elements in the array")
                         .disabled(isSorting)
@@ -135,7 +166,7 @@ struct ControlPanelView: View {
                     }
                     
                     Slider(value: $animationSpeed, in: 0.1...20.0, step: 0.1)
-                        .padding(.vertical, 5)
+                        .padding(.vertical, 2)
                         .accessibilityLabel("Animation Speed Slider")
                         .accessibilityHint("Adjust to change the speed of the sorting animation")
                     
@@ -143,15 +174,16 @@ struct ControlPanelView: View {
                     Toggle(isOn: $isAudioEnabled) {
                         Text("Audio Feedback")
                     }
-                    .padding(.vertical, 5)
+                    .padding(.vertical, 2)
                     .accessibilityLabel("Audio Feedback Toggle")
                     .accessibilityHint("Toggle to enable or disable audio feedback during sorting")
                     
+                    // Buttons row
                     HStack(spacing: 10) {
                         // Randomize Array Button
                         Button(action: onRandomize) {
                             Text("Randomize Array")
-                                .padding()
+                                .padding(.vertical, 8)
                                 .frame(maxWidth: .infinity)
                                 .background(Color.blue)
                                 .foregroundColor(.white)
@@ -164,7 +196,7 @@ struct ControlPanelView: View {
                         if isSorting {
                             Button(action: onStopSorting) {
                                 Text("Stop Sorting")
-                                    .padding()
+                                    .padding(.vertical, 8)
                                     .frame(maxWidth: .infinity)
                                     .background(Color.red)
                                     .foregroundColor(.white)
@@ -174,7 +206,7 @@ struct ControlPanelView: View {
                         } else {
                             Button(action: onStartSorting) {
                                 Text("Start Sorting")
-                                    .padding()
+                                    .padding(.vertical, 8)
                                     .frame(maxWidth: .infinity)
                                     .background(Color.green)
                                     .foregroundColor(.white)
@@ -183,7 +215,7 @@ struct ControlPanelView: View {
                             .accessibilityLabel("Start Sorting Button")
                         }
                     }
-                    .padding(.top, 10)
+                    .padding(.top, 5)
                 }
                 .padding(8)
                 .background(Color.gray.opacity(0.1))
@@ -197,11 +229,13 @@ struct ControlPanelView: View {
     @State var previewArraySize: Double = 50
     @State var previewAnimationSpeed: Double = 1.0
     @State var previewAudioEnabled: Bool = true
+    @State var previewSelectedAlgorithm: SortingAlgorithmType = .bubble
     
     return ControlPanelView(
         arraySize: $previewArraySize,
         animationSpeed: $previewAnimationSpeed,
         isAudioEnabled: $previewAudioEnabled,
+        selectedAlgorithm: $previewSelectedAlgorithm,
         onRandomize: { print("Randomize tapped") },
         onStartSorting: { print("Start Sorting tapped") },
         onStopSorting: { print("Stop Sorting tapped") },
@@ -215,11 +249,13 @@ struct ControlPanelView: View {
     @State var previewArraySize: Double = 50
     @State var previewAnimationSpeed: Double = 1.0
     @State var previewAudioEnabled: Bool = true
+    @State var previewSelectedAlgorithm: SortingAlgorithmType = .bubble
     
     return ControlPanelView(
         arraySize: $previewArraySize,
         animationSpeed: $previewAnimationSpeed,
         isAudioEnabled: $previewAudioEnabled,
+        selectedAlgorithm: $previewSelectedAlgorithm,
         onRandomize: { print("Randomize tapped") },
         onStartSorting: { print("Start Sorting tapped") },
         onStopSorting: { print("Stop Sorting tapped") },
