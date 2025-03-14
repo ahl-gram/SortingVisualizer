@@ -36,8 +36,15 @@ class SortingViewModel: ObservableObject {
         
         // Generate a new array of random values
         var newBars: [SortingBar] = []
+        
+        // Scale the range of values based on array size to ensure they're visually appealing
+        // For smaller arrays, allow taller bars
+        // For larger arrays, keep the height more constrained to avoid overcrowding
+        let minHeight = 10
+        let maxHeight = min(200, 400 - size * 2) // Reduce max height as array size increases
+        
         for _ in 0..<size {
-            let randomValue = Int.random(in: 10...200)
+            let randomValue = Int.random(in: minHeight...maxHeight)
             newBars.append(SortingBar(value: randomValue))
         }
         

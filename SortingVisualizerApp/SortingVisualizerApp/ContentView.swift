@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
+import Combine
 
 struct ContentView: View {
     @State private var arraySize: Double = 50
     @State private var animationSpeed: Double = 1.0
     @StateObject private var viewModel = SortingViewModel()
     @State private var safeAreaInsets: EdgeInsets = EdgeInsets()
+    @State private var arraySizeDebounceTimer: Timer?
     
     var body: some View {
         GeometryReader { geometry in
@@ -34,29 +36,48 @@ struct ContentView: View {
                         // Calculate the width for each bar to fill the available space
                         // while respecting safe areas
                         GeometryReader { vizGeometry in
+                            // Calculate total available width - accounting for safe areas
                             let availableWidth = vizGeometry.size.width - safeAreaInsets.leading - safeAreaInsets.trailing
                             let barCount = viewModel.bars.count
-                            let barSpacing: CGFloat = 2
+                            
+                            // Use smaller spacing for more bars to maximize space usage
+                            let barSpacing: CGFloat = barCount > 60 ? 1 : 2
+                            
+                            // Calculate total width used by spacing between bars
                             let totalSpacingWidth = barSpacing * CGFloat(barCount - 1)
+                            
+                            // Calculate width per bar - ensure we fill the available space
                             let barWidth = max(1, (availableWidth - totalSpacingWidth) / CGFloat(barCount))
+                            
+                            // Calculate maximum bar height to prevent overlap with control panel
+                            // Use 70% of the available height to ensure we leave space for the control panel
+                            let maxAvailableHeight = vizGeometry.size.height * 0.7
+                            
+                            // Find the max value in the array to normalize heights
+                            let maxBarValue = viewModel.bars.map { $0.value }.max() ?? 200
                             
                             HStack(alignment: .bottom, spacing: barSpacing) {
                                 ForEach(viewModel.bars) { bar in
+                                    // Normalize height to fit within available space
+                                    let normalizedHeight = CGFloat(bar.value) / CGFloat(maxBarValue) * maxAvailableHeight
+                                    
                                     SortingBarView(
-                                        height: CGFloat(bar.value),
+                                        height: normalizedHeight,
                                         state: bar.state,
                                         width: barWidth
                                     )
                                 }
                             }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .frame(width: availableWidth, height: vizGeometry.size.height, alignment: .bottom)
                             .background(Color.black)
-                            // Apply padding based on safe area insets
-                            .padding(.leading, safeAreaInsets.leading)
-                            .padding(.trailing, safeAreaInsets.trailing)
+                            // Center the visualization in the available space
+                            .position(x: vizGeometry.size.width / 2, y: vizGeometry.size.height / 2)
                         }
-                        .padding(.horizontal, 5)
+                        // Remove horizontal padding to maximize width
+                        .padding(.horizontal, 0)
                     }
+                    
+                    Spacer(minLength: 10)
                     
                     // Control panel components - adaptive layout based on orientation
                     if geometry.size.width > geometry.size.height {
@@ -78,6 +99,7 @@ struct ContentView: View {
                         )
                         .padding(.horizontal)
                         .padding(.bottom, 5)
+                        .background(Color.black.opacity(0.1))
                     } else {
                         // Portrait mode - more compact control panel
                         CompactControlPanelView(
@@ -97,6 +119,7 @@ struct ContentView: View {
                         )
                         .padding(.horizontal, 5)
                         .padding(.bottom, 5)
+                        .background(Color.black.opacity(0.1))
                     }
                 }
                 // Don't ignore safe areas
@@ -105,6 +128,18 @@ struct ContentView: View {
                 .onAppear {
                     // Initialize with a random array
                     viewModel.randomizeArray(size: Int(arraySize))
+                }
+                .onChange(of: arraySize) { newSize in
+                    // Don't update during sorting
+                    guard !viewModel.isSorting else { return }
+                    
+                    // Cancel any existing timer
+                    arraySizeDebounceTimer?.invalidate()
+                    
+                    // Debounce the array generation to avoid performance issues during slider dragging
+                    arraySizeDebounceTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false) { _ in
+                        viewModel.randomizeArray(size: Int(newSize))
+                    }
                 }
                 
                 // Show completion animation when sorting is complete
