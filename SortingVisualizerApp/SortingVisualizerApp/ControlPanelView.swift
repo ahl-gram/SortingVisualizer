@@ -47,40 +47,6 @@ struct ControlPanelView: View {
                             .padding(.bottom, 5)
                             .accessibilityLabel("Algorithm Description")
                         
-                        // Audio Toggle
-                        Toggle(isOn: $isAudioEnabled) {
-                            Text("Sound Effects")
-                        }
-                        .accessibilityLabel("Sound Effects Toggle")
-                        .padding(.top, 5)
-                    }
-                    .frame(maxWidth: .infinity)
-                    
-                    // Right column - sliders and buttons
-                    VStack(alignment: .leading, spacing: 8) {
-                        // Array Size Slider
-                        HStack {
-                            Text("Array Size:")
-                            Spacer()
-                            Text("\(Int(arraySize))")
-                                .frame(width: 40, alignment: .trailing)
-                        }
-                        
-                        Slider(value: $arraySize, in: 10...100, step: 1)
-                            .accessibilityLabel("Array Size Slider")
-                            .disabled(isSorting)
-                        
-                        // Animation Speed Slider
-                        HStack {
-                            Text("Animation Speed:")
-                            Spacer()
-                            Text("\(String(format: "%.1f", animationSpeed))x")
-                                .frame(width: 40, alignment: .trailing)
-                        }
-                        
-                        Slider(value: $animationSpeed, in: 0.1...20.0, step: 0.1)
-                            .accessibilityLabel("Animation Speed Slider")
-                        
                         Spacer()
                         
                         // Buttons
@@ -122,6 +88,42 @@ struct ControlPanelView: View {
                         }
                     }
                     .frame(maxWidth: .infinity)
+                    
+                    // Right column - sliders and audio toggle
+                    VStack(alignment: .leading, spacing: 8) {
+                        // Array Size Slider
+                        HStack {
+                            Text("Array Size:")
+                            Spacer()
+                            Text("\(Int(arraySize))")
+                                .frame(width: 40, alignment: .trailing)
+                        }
+                        
+                        Slider(value: $arraySize, in: 10...100, step: 1)
+                            .accessibilityLabel("Array Size Slider")
+                            .disabled(isSorting)
+                        
+                        // Animation Speed Slider
+                        HStack {
+                            Text("Animation Speed:")
+                            Spacer()
+                            Text("\(String(format: "%.1f", animationSpeed))x")
+                                .frame(width: 40, alignment: .trailing)
+                        }
+                        
+                        Slider(value: $animationSpeed, in: 0.1...20.0, step: 0.1)
+                            .accessibilityLabel("Animation Speed Slider")
+                        
+                        Spacer()
+                        
+                        // Audio Toggle
+                        Toggle(isOn: $isAudioEnabled) {
+                            Text("Sound Effects")
+                        }
+                        .accessibilityLabel("Sound Effects Toggle")
+                        .padding(.top, 5)
+                    }
+                    .frame(maxWidth: .infinity)
                 }
                 .padding(.vertical, 10)
                 .padding(.horizontal, 8)
@@ -158,13 +160,44 @@ struct ControlPanelView: View {
                         }
                         .frame(maxWidth: .infinity)
                         
-                        // Right side - Audio toggle
-                        Toggle(isOn: $isAudioEnabled) {
-                            Text("Audio")
+                        // Right side - Buttons
+                        HStack(spacing: 10) {
+                            // Randomize Array Button
+                            Button(action: onRandomize) {
+                                Text("Randomize Array")
+                                    .padding(.vertical, 8)
+                                    .frame(maxWidth: .infinity)
+                                    .background(Color.blue)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(8)
+                            }
+                            .disabled(isSorting)
+                            .accessibilityLabel("Randomize Array Button")
+                            
+                            // Start/Stop Sorting Button
+                            if isSorting {
+                                Button(action: onStopSorting) {
+                                    Text("Stop Sorting")
+                                        .padding(.vertical, 8)
+                                        .frame(maxWidth: .infinity)
+                                        .background(Color.red)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(8)
+                                }
+                                .accessibilityLabel("Stop Sorting Button")
+                            } else {
+                                Button(action: onStartSorting) {
+                                    Text("Start Sorting")
+                                        .padding(.vertical, 8)
+                                        .frame(maxWidth: .infinity)
+                                        .background(Color.green)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(8)
+                                }
+                                .accessibilityLabel("Start Sorting Button")
+                            }
                         }
-                        .accessibilityLabel("Sound Effects Toggle")
-                        .accessibilityHint("Toggle to enable or disable sound effects during sorting")
-                        .frame(width: 100)
+                        .frame(width: 250)
                     }
                     
                     // Middle section - sliders
@@ -201,43 +234,13 @@ struct ControlPanelView: View {
                         .frame(maxWidth: .infinity)
                     }
                     
-                    // Buttons row
-                    HStack(spacing: 10) {
-                        // Randomize Array Button
-                        Button(action: onRandomize) {
-                            Text("Randomize Array")
-                                .padding(.vertical, 8)
-                                .frame(maxWidth: .infinity)
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(8)
-                        }
-                        .disabled(isSorting)
-                        .accessibilityLabel("Randomize Array Button")
-                        
-                        // Start/Stop Sorting Button
-                        if isSorting {
-                            Button(action: onStopSorting) {
-                                Text("Stop Sorting")
-                                    .padding(.vertical, 8)
-                                    .frame(maxWidth: .infinity)
-                                    .background(Color.red)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(8)
-                            }
-                            .accessibilityLabel("Stop Sorting Button")
-                        } else {
-                            Button(action: onStartSorting) {
-                                Text("Start Sorting")
-                                    .padding(.vertical, 8)
-                                    .frame(maxWidth: .infinity)
-                                    .background(Color.green)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(8)
-                            }
-                            .accessibilityLabel("Start Sorting Button")
-                        }
+                    // Sound Effects toggle
+                    Toggle(isOn: $isAudioEnabled) {
+                        Text("Sound Effects")
                     }
+                    .accessibilityLabel("Sound Effects Toggle")
+                    .accessibilityHint("Toggle to enable or disable sound effects during sorting")
+                    .frame(maxWidth: .infinity)
                     .padding(.top, 5)
                 }
                 .padding(8)
