@@ -24,9 +24,6 @@ struct ControlPanelView: View {
                 HStack(alignment: .top, spacing: 15) {
                     // Left column - algorithm picker and description
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Controls")
-                            .font(.headline)
-                        
                         // Algorithm Picker - Dropdown style
                         HStack {
                             Text("Algorithm:")
@@ -133,10 +130,6 @@ struct ControlPanelView: View {
             } else {
                 // Standard layout for smaller screens - adjust to keep controls visible
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Controls")
-                        .font(.headline)
-                        .padding(.bottom, 2)
-                    
                     // Top row with algorithm picker and audio toggle
                     HStack(alignment: .top) {
                         // Left side - Algorithm picker and description
