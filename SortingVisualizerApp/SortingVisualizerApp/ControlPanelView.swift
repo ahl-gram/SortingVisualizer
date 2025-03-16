@@ -52,9 +52,9 @@ struct ControlPanelView: View {
                         
                         // Buttons
                         HStack(spacing: 10) {
-                            // Randomize Array Button
+                            // Randomize Button
                             Button(action: onRandomize) {
-                                Text("Randomize Array")
+                                Text("Randomize")
                                     .padding(.vertical, 8)
                                     .frame(maxWidth: .infinity)
                                     .background(Color.blue)
@@ -62,29 +62,29 @@ struct ControlPanelView: View {
                                     .cornerRadius(8)
                             }
                             .disabled(isSorting)
-                            .accessibilityLabel("Randomize Array Button")
+                            .accessibilityLabel("Randomize Button")
                             
                             // Start/Stop Sorting Button
                             if isSorting {
                                 Button(action: onStopSorting) {
-                                    Text("Stop Sorting")
+                                    Text("Stop")
                                         .padding(.vertical, 8)
                                         .frame(maxWidth: .infinity)
                                         .background(Color.red)
                                         .foregroundColor(.white)
                                         .cornerRadius(8)
                                 }
-                                .accessibilityLabel("Stop Sorting Button")
+                                .accessibilityLabel("Stop Button")
                             } else {
                                 Button(action: onStartSorting) {
-                                    Text("Start Sorting")
+                                    Text("Start")
                                         .padding(.vertical, 8)
                                         .frame(maxWidth: .infinity)
                                         .background(Color.green)
                                         .foregroundColor(.white)
                                         .cornerRadius(8)
                                 }
-                                .accessibilityLabel("Start Sorting Button")
+                                .accessibilityLabel("Start Button")
                             }
                         }
                     }
@@ -164,9 +164,9 @@ struct ControlPanelView: View {
                         
                         // Right side - Buttons
                         HStack(spacing: 10) {
-                            // Randomize Array Button
+                            // Randomize Button
                             Button(action: onRandomize) {
-                                Text("Randomize Array")
+                                Text("Randomize")
                                     .padding(.vertical, 8)
                                     .frame(maxWidth: .infinity)
                                     .background(Color.blue)
@@ -174,19 +174,19 @@ struct ControlPanelView: View {
                                     .cornerRadius(8)
                             }
                             .disabled(isSorting)
-                            .accessibilityLabel("Randomize Array Button")
+                            .accessibilityLabel("Randomize Button")
                             
                             // Start/Stop Sorting Button
                             if isSorting {
                                 Button(action: onStopSorting) {
-                                    Text("Stop Sorting")
+                                    Text("Stop")
                                         .padding(.vertical, 8)
                                         .frame(maxWidth: .infinity)
                                         .background(Color.red)
                                         .foregroundColor(.white)
                                         .cornerRadius(8)
                                 }
-                                .accessibilityLabel("Stop Sorting Button")
+                                .accessibilityLabel("Stop Button")
                             } else {
                                 Button(action: onStartSorting) {
                                     Text("Start Sorting")
@@ -196,7 +196,7 @@ struct ControlPanelView: View {
                                         .foregroundColor(.white)
                                         .cornerRadius(8)
                                 }
-                                .accessibilityLabel("Start Sorting Button")
+                                .accessibilityLabel("Start Button")
                             }
                         }
                         .frame(width: 250)
@@ -265,8 +265,8 @@ struct ControlPanelView: View {
         isAudioEnabled: $previewAudioEnabled,
         selectedAlgorithm: $previewSelectedAlgorithm,
         onRandomize: { print("Randomize tapped") },
-        onStartSorting: { print("Start Sorting tapped") },
-        onStopSorting: { print("Stop Sorting tapped") },
+        onStartSorting: { print("Start tapped") },
+        onStopSorting: { print("Stop tapped") },
         isSorting: false
     )
     .frame(width: 500, height: 300)
@@ -285,8 +285,8 @@ struct ControlPanelView: View {
         isAudioEnabled: $previewAudioEnabled,
         selectedAlgorithm: $previewSelectedAlgorithm,
         onRandomize: { print("Randomize tapped") },
-        onStartSorting: { print("Start Sorting tapped") },
-        onStopSorting: { print("Stop Sorting tapped") },
+        onStartSorting: { print("Start tapped") },
+        onStopSorting: { print("Stop tapped") },
         isSorting: false
     )
     .frame(width: 700, height: 200)
