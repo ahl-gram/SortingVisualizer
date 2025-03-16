@@ -21,36 +21,68 @@ struct ControlPanelView: View {
         GeometryReader { geometry in
             if geometry.size.width > 600 {
                 // Wide landscape layout - horizontal arrangement
-                HStack(alignment: .top, spacing: 15) {
-                    // Left column - algorithm picker and description
-                    VStack(alignment: .leading, spacing: 8) {
-                        // Algorithm Picker - Dropdown style
-                        HStack {
-                            Text("Algorithm:")
-                            Spacer()
-                            Picker("Select Algorithm", selection: $selectedAlgorithm) {
-                                ForEach(SortingAlgorithmType.allCases) { algorithm in
-                                    Text(algorithm.rawValue).tag(algorithm)
+                VStack(spacing: 5) {
+                    // Top section with algorithm picker, description and sliders
+                    HStack(alignment: .top, spacing: 15) {
+                        // Left column - algorithm picker and description
+                        VStack(alignment: .leading, spacing: 6) {
+                            // Algorithm Picker - Dropdown style
+                            HStack {
+                                Text("Algorithm:")
+                                Spacer()
+                                Picker("Select Algorithm", selection: $selectedAlgorithm) {
+                                    ForEach(SortingAlgorithmType.allCases) { algorithm in
+                                        Text(algorithm.rawValue).tag(algorithm)
+                                    }
                                 }
+                                .frame(width: 180)
+                                .disabled(isSorting)
+                                .accessibilityLabel("Algorithm Selector")
                             }
-                            .frame(width: 180)
-                            .disabled(isSorting)
-                            .accessibilityLabel("Algorithm Selector")
+                            .padding(.bottom, 2)
+                            
+                            // Algorithm Description
+                            Text(selectedAlgorithm.description)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(.bottom, 3)
+                                .accessibilityLabel("Algorithm Description")
+                                .frame(height: 50, alignment: .top)
                         }
-                        .padding(.bottom, 2)
+                        .frame(maxWidth: .infinity)
                         
-                        // Algorithm Description
-                        Text(selectedAlgorithm.description)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .padding(.bottom, 5)
-                            .accessibilityLabel("Algorithm Description")
-                            .frame(height: 60, alignment: .top)
-                        
-                        Spacer()
-                        
-                        // Buttons
+                        // Right column - sliders
+                        VStack(alignment: .leading, spacing: 8) {
+                            // Array Size Slider
+                            HStack {
+                                Text("Array Size:")
+                                Spacer()
+                                Text("\(Int(arraySize))")
+                                    .frame(width: 40, alignment: .trailing)
+                            }
+                            
+                            Slider(value: $arraySize, in: 10...100, step: 1)
+                                .accessibilityLabel("Array Size Slider")
+                                .disabled(isSorting)
+                            
+                            // Animation Speed Slider
+                            HStack {
+                                Text("Animation Speed:")
+                                Spacer()
+                                Text("\(Int(animationSpeed))x")
+                                    .frame(width: 40, alignment: .trailing)
+                            }
+                            
+                            Slider(value: $animationSpeed, in: 1...20, step: 1)
+                                .accessibilityLabel("Animation Speed Slider")
+                            }
+                        .frame(maxWidth: .infinity)
+                    }
+                    
+                    // Bottom row with buttons and sound toggle aligned horizontally
+                    HStack {
+                        // Buttons on the left
                         HStack(spacing: 10) {
                             // Randomize Button
                             Button(action: onRandomize) {
@@ -87,56 +119,30 @@ struct ControlPanelView: View {
                                 .accessibilityLabel("Start Button")
                             }
                         }
-                    }
-                    .frame(maxWidth: .infinity)
-                    
-                    // Right column - sliders and audio toggle
-                    VStack(alignment: .leading, spacing: 8) {
-                        // Array Size Slider
-                        HStack {
-                            Text("Array Size:")
-                            Spacer()
-                            Text("\(Int(arraySize))")
-                                .frame(width: 40, alignment: .trailing)
-                        }
-                        
-                        Slider(value: $arraySize, in: 10...100, step: 1)
-                            .accessibilityLabel("Array Size Slider")
-                            .disabled(isSorting)
-                        
-                        // Animation Speed Slider
-                        HStack {
-                            Text("Animation Speed:")
-                            Spacer()
-                            Text("\(Int(animationSpeed))x")
-                                .frame(width: 40, alignment: .trailing)
-                        }
-                        
-                        Slider(value: $animationSpeed, in: 1...20, step: 1)
-                            .accessibilityLabel("Animation Speed Slider")
+                        // make the width 50% of the control panel
+                        .frame(width: geometry.size.width / 2)
                         
                         Spacer()
                         
-                        // Audio Toggle
+                        // Audio Toggle on the right
                         Toggle(isOn: $isAudioEnabled) {
                             Text("Sound Effects")
                         }
                         .accessibilityLabel("Sound Effects Toggle")
-                        .padding(.top, 5)
+                        .frame(width: 180)
                     }
-                    .frame(maxWidth: .infinity)
                 }
-                .padding(.vertical, 10)
+                .padding(.vertical, 8)
                 .padding(.horizontal, 8)
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(10)
             } else {
                 // Standard layout for smaller screens - adjust to keep controls visible
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 6) {
                     // Top row with algorithm picker and audio toggle
                     HStack(alignment: .top) {
                         // Left side - Algorithm picker and description
-                        VStack(alignment: .leading, spacing: 5) {
+                        VStack(alignment: .leading, spacing: 4) {
                             // Algorithm Picker - Dropdown style
                             HStack {
                                 Text("Algorithm:")
@@ -156,9 +162,9 @@ struct ControlPanelView: View {
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
-                                .padding(.bottom, 5)
+                                .padding(.bottom, 3)
                                 .accessibilityLabel("Algorithm Description")
-                                .frame(height: 60, alignment: .top)
+                                .frame(height: 50, alignment: .top)
                         }
                         .frame(maxWidth: .infinity)
                         
@@ -203,7 +209,7 @@ struct ControlPanelView: View {
                     }
                     
                     // Middle section - sliders
-                    HStack(alignment: .top, spacing: 12) {
+                    HStack(alignment: .top, spacing: 10) {
                         // Left slider - Array Size
                         VStack(alignment: .leading) {
                             HStack {
@@ -243,9 +249,9 @@ struct ControlPanelView: View {
                     .accessibilityLabel("Sound Effects Toggle")
                     .accessibilityHint("Toggle to enable or disable sound effects during sorting")
                     .frame(maxWidth: .infinity)
-                    .padding(.top, 5)
+                    .padding(.top, 3)
                 }
-                .padding(8)
+                .padding(6)
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(10)
             }
