@@ -21,8 +21,8 @@ struct ControlPanelView: View {
         GeometryReader { geometry in
             if geometry.size.width > 600 {
                 // Wide landscape layout - horizontal arrangement
-                HStack(alignment: .center, spacing: 15) {
-                    // Left column - sliders and algorithm picker
+                HStack(alignment: .top, spacing: 15) {
+                    // Left column - algorithm picker and description
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Controls")
                             .font(.headline)
@@ -39,8 +39,27 @@ struct ControlPanelView: View {
                             .disabled(isSorting)
                             .accessibilityLabel("Algorithm Selector")
                         }
-                        .padding(.bottom, 5)
+                        .padding(.bottom, 2)
                         
+                        // Algorithm Description
+                        Text(selectedAlgorithm.description)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.bottom, 5)
+                            .accessibilityLabel("Algorithm Description")
+                        
+                        // Audio Toggle
+                        Toggle(isOn: $isAudioEnabled) {
+                            Text("Audio Feedback")
+                        }
+                        .accessibilityLabel("Audio Feedback Toggle")
+                        .padding(.top, 5)
+                    }
+                    .frame(maxWidth: .infinity)
+                    
+                    // Right column - sliders and buttons
+                    VStack(alignment: .leading, spacing: 8) {
                         // Array Size Slider
                         HStack {
                             Text("Array Size:")
@@ -63,16 +82,6 @@ struct ControlPanelView: View {
                         
                         Slider(value: $animationSpeed, in: 0.1...20.0, step: 0.1)
                             .accessibilityLabel("Animation Speed Slider")
-                    }
-                    .frame(maxWidth: .infinity)
-                    
-                    // Right column - toggles and buttons
-                    VStack(alignment: .leading, spacing: 8) {
-                        // Audio Toggle
-                        Toggle(isOn: $isAudioEnabled) {
-                            Text("Audio Feedback")
-                        }
-                        .accessibilityLabel("Audio Feedback Toggle")
                         
                         Spacer()
                         
@@ -121,62 +130,83 @@ struct ControlPanelView: View {
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(10)
             } else {
-                // Standard layout for smaller screens
+                // Standard layout for smaller screens - adjust to keep controls visible
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Controls")
                         .font(.headline)
                         .padding(.bottom, 2)
                     
-                    // Algorithm Picker
-                    HStack {
-                        Text("Algorithm:")
-                        Spacer()
-                        Picker("Algorithm", selection: $selectedAlgorithm) {
-                            ForEach(SortingAlgorithmType.allCases) { algorithm in
-                                Text(algorithm.rawValue).tag(algorithm)
+                    // Top row with algorithm picker and audio toggle
+                    HStack(alignment: .top) {
+                        // Left side - Algorithm picker and description
+                        VStack(alignment: .leading, spacing: 5) {
+                            // Algorithm Picker
+                            HStack {
+                                Text("Algorithm:")
+                                Spacer()
+                                Picker("Algorithm", selection: $selectedAlgorithm) {
+                                    ForEach(SortingAlgorithmType.allCases) { algorithm in
+                                        Text(algorithm.rawValue).tag(algorithm)
+                                    }
+                                }
+                                .pickerStyle(SegmentedPickerStyle())
+                                .frame(maxWidth: 240)
+                                .disabled(isSorting)
+                                .accessibilityLabel("Algorithm Selector")
                             }
+                            
+                            // Algorithm Description
+                            Text(selectedAlgorithm.description)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(.bottom, 5)
+                                .accessibilityLabel("Algorithm Description")
                         }
-                        .pickerStyle(SegmentedPickerStyle())
-                        .frame(maxWidth: 240)
-                        .disabled(isSorting)
-                        .accessibilityLabel("Algorithm Selector")
-                    }
-                    .padding(.vertical, 2)
-                    
-                    // Array Size Slider
-                    HStack {
-                        Text("Array Size:")
-                        Spacer()
-                        Text("\(Int(arraySize))")
-                            .frame(width: 40, alignment: .trailing)
+                        .frame(maxWidth: .infinity)
+                        
+                        // Right side - Audio toggle
+                        Toggle(isOn: $isAudioEnabled) {
+                            Text("Audio")
+                        }
+                        .accessibilityLabel("Audio Feedback Toggle")
+                        .accessibilityHint("Toggle to enable or disable audio feedback during sorting")
+                        .frame(width: 100)
                     }
                     
-                    Slider(value: $arraySize, in: 10...100, step: 1)
-                        .padding(.vertical, 2)
-                        .accessibilityLabel("Array Size Slider")
-                        .accessibilityHint("Adjust to change the number of elements in the array")
-                        .disabled(isSorting)
-                    
-                    // Animation Speed Slider
-                    HStack {
-                        Text("Animation Speed:")
-                        Spacer()
-                        Text("\(String(format: "%.1f", animationSpeed))x")
-                            .frame(width: 40, alignment: .trailing)
+                    // Middle section - sliders
+                    HStack(alignment: .top, spacing: 12) {
+                        // Left slider - Array Size
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text("Array Size:")
+                                Spacer()
+                                Text("\(Int(arraySize))")
+                                    .frame(width: 40, alignment: .trailing)
+                            }
+                            
+                            Slider(value: $arraySize, in: 10...100, step: 1)
+                                .accessibilityLabel("Array Size Slider")
+                                .accessibilityHint("Adjust to change the number of elements in the array")
+                                .disabled(isSorting)
+                        }
+                        .frame(maxWidth: .infinity)
+                        
+                        // Right slider - Animation Speed
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text("Animation Speed:")
+                                Spacer()
+                                Text("\(String(format: "%.1f", animationSpeed))x")
+                                    .frame(width: 40, alignment: .trailing)
+                            }
+                            
+                            Slider(value: $animationSpeed, in: 0.1...20.0, step: 0.1)
+                                .accessibilityLabel("Animation Speed Slider")
+                                .accessibilityHint("Adjust to change the speed of the sorting animation")
+                        }
+                        .frame(maxWidth: .infinity)
                     }
-                    
-                    Slider(value: $animationSpeed, in: 0.1...20.0, step: 0.1)
-                        .padding(.vertical, 2)
-                        .accessibilityLabel("Animation Speed Slider")
-                        .accessibilityHint("Adjust to change the speed of the sorting animation")
-                    
-                    // Audio Toggle
-                    Toggle(isOn: $isAudioEnabled) {
-                        Text("Audio Feedback")
-                    }
-                    .padding(.vertical, 2)
-                    .accessibilityLabel("Audio Feedback Toggle")
-                    .accessibilityHint("Toggle to enable or disable audio feedback during sorting")
                     
                     // Buttons row
                     HStack(spacing: 10) {
