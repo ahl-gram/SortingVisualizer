@@ -23,6 +23,13 @@ struct ContentView: View {
                 SafeAreaInsetsReader(insets: $safeAreaInsets)
                 
                 VStack(spacing: 0) {
+                    // Title at the top
+                    Text("Sorting Visualizer")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .padding(.top, safeAreaInsets.top > 0 ? 0 : 10)
+                        .padding(.bottom, 5)
+                    
                     // add a spacer to the top of the view
                     Spacer()
                     // Sorting visualization area with proper insets
@@ -130,9 +137,8 @@ struct ContentView: View {
             }
         }
         .respectSafeAreas() // Use our custom modifier instead of ignoring safe areas
-        .navigationTitle("Sorting Visualizer")
-        }
     }
+}
 
 #Preview {
     ContentView()
