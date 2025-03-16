@@ -13,6 +13,7 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
     case bubble = "Bubble Sort"
     case quick = "Quick Sort"
     case merge = "Merge Sort"
+    case insertion = "Insertion Sort"
     
     var id: String { self.rawValue }
     
@@ -24,6 +25,8 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
             return "A divide-and-conquer algorithm that works by selecting a 'pivot' element and partitioning the array around the pivot."
         case .merge:
             return "An efficient, stable, divide-and-conquer algorithm that divides the array into halves, sorts them separately, and then merges the sorted halves."
+        case .insertion:
+            return "A simple sorting algorithm that builds the final sorted array one item at a time, similar to how people sort playing cards in their hands."
         }
     }
 }
@@ -372,14 +375,8 @@ enum SortingAlgorithms {
         let values = localBars.map { $0.value }
         
         // Run the pure sorting algorithm with visualization steps
-        let sortedValues = await SortingLogic.mergeSort(array: values) { step, currentArray in
-            // For each step, ensure the visual bars array has the same values as the algorithm array
-            if case .merge(let index, let newValue) = step {
-                // For merge operations, explicitly update the bar's value
-                localBars[index].value = newValue
-            }
-            
-            return await processSortingStep(
+        _ = await SortingLogic.mergeSort(array: values) { step, _ in
+            await processSortingStep(
                 step: step,
                 bars: &localBars,
                 params: params,
@@ -388,15 +385,44 @@ enum SortingAlgorithms {
                 scaledDelay: scaledDelay
             )
         }
+    }
+    
+    // Insertion sort implementation
+    static func insertionSort(
+        bars: [SortingViewModel.SortingBar],
+        animationSpeed: Double,
+        isAudioEnabled: Bool,
+        audioManager: AudioManager,
+        updateBars: @escaping ([SortingViewModel.SortingBar]) -> Void,
+        markAllAsSorted: @escaping () -> Void,
+        onComplete: @escaping () -> Void
+    ) async {
+        var localBars = bars
         
-        // Ensure the bars array is correctly sorted at the end
-        await MainActor.run {
-            for i in 0..<min(localBars.count, sortedValues.count) {
-                localBars[i].value = sortedValues[i]
-            }
-            updateBars(localBars)
-            markAllAsSorted()
-            onComplete()
+        // Create params struct for helper methods
+        let params = SortingParams(
+            animationSpeed: animationSpeed,
+            isAudioEnabled: isAudioEnabled,
+            audioManager: audioManager,
+            updateBars: updateBars
+        )
+        
+        // Calculate delay once
+        let scaledDelay = calculateDelay(animationSpeed: animationSpeed)
+        
+        // Extract bar values for sorting
+        let values = localBars.map { $0.value }
+        
+        // Run the pure sorting algorithm with visualization steps
+        _ = await SortingLogic.insertionSort(array: values) { step, _ in
+            await processSortingStep(
+                step: step,
+                bars: &localBars,
+                params: params,
+                markAllAsSorted: markAllAsSorted,
+                onComplete: onComplete,
+                scaledDelay: scaledDelay
+            )
         }
     }
 } 

@@ -178,6 +178,29 @@ class SortingViewModel: ObservableObject {
                         }
                     }
                 )
+            case .insertion:
+                await SortingAlgorithms.insertionSort(
+                    bars: bars,
+                    animationSpeed: animationSpeed,
+                    isAudioEnabled: isAudioEnabled,
+                    audioManager: audioManager,
+                    updateBars: { [weak self] updatedBars in
+                        self?.bars = updatedBars
+                    },
+                    markAllAsSorted: { [weak self] in
+                        self?.markAllAsSorted()
+                    },
+                    onComplete: { [weak self] in
+                        guard let self = self else { return }
+                        // Run the completion animation before marking sort as done
+                        Task {
+                            await self.playCompletionAnimation(animationSpeed: animationSpeed)
+                            await MainActor.run {
+                                self.isSorting = false
+                            }
+                        }
+                    }
+                )
             }
         }
     }
