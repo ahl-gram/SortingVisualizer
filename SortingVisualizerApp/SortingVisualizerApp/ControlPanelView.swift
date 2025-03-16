@@ -259,42 +259,35 @@ struct ControlPanelView: View {
     }
 }
 
-#Preview("Standard") {
-    @State var previewArraySize: Double = 50
-    @State var previewAnimationSpeed: Double = 1.0
-    @State var previewAudioEnabled: Bool = true
-    @State var previewSelectedAlgorithm: SortingAlgorithmType = .bubble
+// Wrapper struct for previews to avoid @State warnings
+struct ControlPanelPreviewWrapper: View {
+    @State private var arraySize: Double = 50
+    @State private var animationSpeed: Double = 1.0
+    @State private var isAudioEnabled: Bool = true
+    @State private var selectedAlgorithm: SortingAlgorithmType = .bubble
+    var width: CGFloat
+    var height: CGFloat
     
-    return ControlPanelView(
-        arraySize: $previewArraySize,
-        animationSpeed: $previewAnimationSpeed,
-        isAudioEnabled: $previewAudioEnabled,
-        selectedAlgorithm: $previewSelectedAlgorithm,
-        onRandomize: { print("Randomize tapped") },
-        onStartSorting: { print("Start tapped") },
-        onStopSorting: { print("Stop tapped") },
-        isSorting: false
-    )
-    .frame(width: 500, height: 300)
-    .padding()
+    var body: some View {
+        ControlPanelView(
+            arraySize: $arraySize,
+            animationSpeed: $animationSpeed,
+            isAudioEnabled: $isAudioEnabled,
+            selectedAlgorithm: $selectedAlgorithm,
+            onRandomize: { print("Randomize tapped") },
+            onStartSorting: { print("Start tapped") },
+            onStopSorting: { print("Stop tapped") },
+            isSorting: false
+        )
+        .frame(width: width, height: height)
+        .padding()
+    }
+}
+
+#Preview("Standard") {
+    ControlPanelPreviewWrapper(width: 500, height: 300)
 }
 
 #Preview("Wide Landscape") {
-    @State var previewArraySize: Double = 50
-    @State var previewAnimationSpeed: Double = 1.0
-    @State var previewAudioEnabled: Bool = true
-    @State var previewSelectedAlgorithm: SortingAlgorithmType = .bubble
-    
-    return ControlPanelView(
-        arraySize: $previewArraySize,
-        animationSpeed: $previewAnimationSpeed,
-        isAudioEnabled: $previewAudioEnabled,
-        selectedAlgorithm: $previewSelectedAlgorithm,
-        onRandomize: { print("Randomize tapped") },
-        onStartSorting: { print("Start tapped") },
-        onStopSorting: { print("Stop tapped") },
-        isSorting: false
-    )
-    .frame(width: 700, height: 200)
-    .padding()
+    ControlPanelPreviewWrapper(width: 700, height: 200)
 } 
