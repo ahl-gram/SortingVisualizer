@@ -46,6 +46,7 @@ struct ControlPanelView: View {
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(.bottom, 5)
                             .accessibilityLabel("Algorithm Description")
+                            .frame(height: 60, alignment: .top)
                         
                         Spacer()
                         
@@ -157,6 +158,7 @@ struct ControlPanelView: View {
                                 .fixedSize(horizontal: false, vertical: true)
                                 .padding(.bottom, 5)
                                 .accessibilityLabel("Algorithm Description")
+                                .frame(height: 60, alignment: .top)
                         }
                         .frame(maxWidth: .infinity)
                         
