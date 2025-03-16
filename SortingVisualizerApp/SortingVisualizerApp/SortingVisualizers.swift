@@ -359,6 +359,18 @@ enum SortingVisualizers {
                     scaledDelay: scaledDelay
                 )
             }
+            
+        case .heap:
+            _ = await SortingAlgorithms.heapSort(array: values) { step, _ in
+                await processSortingStep(
+                    step: step,
+                    bars: &localBars,
+                    params: params,
+                    markAllAsSorted: markAllAsSorted,
+                    onComplete: onComplete,
+                    scaledDelay: scaledDelay
+                )
+            }
         }
     }
 } 
