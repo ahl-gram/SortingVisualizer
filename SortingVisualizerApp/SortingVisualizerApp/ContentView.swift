@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import ActivityKit
 
 struct ContentView: View {
     @State private var arraySize: Double = 50
@@ -14,6 +15,8 @@ struct ContentView: View {
     @StateObject private var viewModel = SortingViewModel()
     @State private var safeAreaInsets: EdgeInsets = EdgeInsets()
     @State private var arraySizeDebounceTimer: Timer?
+    @State private var diagnosticMessage: String = ""
+    @State private var showDiagnosticAlert: Bool = false
     
     var body: some View {
         GeometryReader { geometry in
@@ -104,8 +107,36 @@ struct ContentView: View {
                     .background(Color.black.opacity(0.1))
                     // Set minimum height for the control panel to ensure all controls are visible
                     .frame(minHeight: 180)
+                    
+                    // Debug test buttons (only in debug builds)
+                    #if DEBUG
+                    HStack {
+                        Button("Test Live Activity") {
+                            // Create a test LiveActivityManager
+                            let testManager = LiveActivityManager()
+                            // Start a test activity with sample data
+                            testManager.startLiveActivity(
+                                algorithmName: "Test",
+                                barHeights: [100, 200, 150, 300, 250, 180, 120, 220]
+                            )
+                            print("Manually triggered Live Activity test")
+                        }
+                        .padding()
+                        .background(Color.purple)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                        
+                        Button("Diagnostics") {
+                            runLiveActivityDiagnostics()
+                        }
+                        .padding()
+                        .background(Color.orange)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                    }
+                    .padding(.bottom, 10)
+                    #endif
                 }
-                // Don't ignore safe areas
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .avoidDynamicIsland()
                 .onAppear {
@@ -137,6 +168,62 @@ struct ContentView: View {
             }
         }
         .respectSafeAreas() // Use our custom modifier instead of ignoring safe areas
+        .alert("Live Activity Diagnostics", isPresented: $showDiagnosticAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(diagnosticMessage)
+        }
+    }
+    
+    private func runLiveActivityDiagnostics() {
+        var message = ""
+        
+        // Check authorization
+        let authInfo = ActivityAuthorizationInfo()
+        message += "Live Activities enabled: \(authInfo.areActivitiesEnabled)\n"
+        
+        // Check bundle ID
+        message += "Main App Bundle ID: \(Bundle.main.bundleIdentifier ?? "unknown")\n"
+        
+        // Check for active activities
+        if #available(iOS 16.2, *) {
+            let activities = Activity<VerticalBarsAttributes>.activities
+            message += "Active Activities: \(activities.count)\n"
+            
+            if activities.isEmpty {
+                // Try to start a test activity
+                do {
+                    let initialState = VerticalBarsAttributes.ContentState(
+                        barHeights: [0.5, 0.3, 0.8, 0.2],
+                        currentIntensity: 0.5,
+                        isPlaying: true
+                    )
+                    
+                    let attributes = VerticalBarsAttributes(
+                        sessionName: "Diagnostic Test",
+                        startTime: Date()
+                    )
+                    
+                    let activity = try Activity.request(
+                        attributes: attributes,
+                        contentState: initialState,
+                        pushType: nil
+                    )
+                    
+                    message += "Successfully created diagnostic Live Activity: \(activity.id)\n"
+                    message += "IMPORTANT: Check Device menu now for 'Trigger Live Activity' option"
+                } catch {
+                    message += "Error creating diagnostic activity: \(error.localizedDescription)\n"
+                    message += "Detailed error: \(error)\n"
+                }
+            }
+        } else {
+            message += "iOS 16.2+ required for Activity.activities API\n"
+        }
+        
+        print("DIAGNOSTIC: \(message)")
+        self.diagnosticMessage = message
+        self.showDiagnosticAlert = true
     }
 }
 

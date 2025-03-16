@@ -9,96 +9,60 @@ import ActivityKit
 import WidgetKit
 import SwiftUI
 
-// Using our defined VerticalBarsAttributes from the main app
+// Using our defined VerticalBarsAttributes
 struct SortingVisualizerWidgetLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: VerticalBarsAttributes.self) { context in
-            // Lock screen/banner UI goes here
-            VStack {
+            // Lock screen/banner UI goes here - simplified version
+            HStack {
                 Text(context.attributes.sessionName)
                     .font(.headline)
                 
-                // Visualization of bars
-                HStack(spacing: 2) {
-                    ForEach(Array(context.state.barHeights.enumerated()), id: \.offset) { index, height in
-                        Rectangle()
-                            .fill(height > 0.7 ? Color.red : Color.blue)
-                            .frame(width: 6, height: CGFloat(height * 50))
-                            .animation(.spring(response: 0.3), value: height)
-                    }
-                }
-                .frame(height: 60)
-                .padding()
+                Spacer()
                 
-                Text("Intensity: \(Int(context.state.currentIntensity * 100))%")
-                    .font(.caption)
+                Text(context.state.isPlaying ? "Sorting..." : "Paused")
             }
-            .activityBackgroundTint(Color.cyan)
-            .activitySystemActionForegroundColor(Color.black)
+            .padding()
+            .activityBackgroundTint(Color.blue.opacity(0.2))
 
         } dynamicIsland: { context in
             DynamicIsland {
-                // Expanded UI goes here
+                // Expanded UI goes here - simplified for reliability
                 DynamicIslandExpandedRegion(.leading) {
-                    VStack {
-                        Text(context.attributes.sessionName)
-                            .font(.caption)
-                        Text(context.state.isPlaying ? "Sorting" : "Paused")
-                            .font(.caption2)
-                    }
+                    Text(context.attributes.sessionName)
+                        .font(.headline)
                 }
                 
                 DynamicIslandExpandedRegion(.trailing) {
-                    Text("Intensity: \(Int(context.state.currentIntensity * 100))%")
-                        .font(.caption2)
+                    Text(context.state.isPlaying ? "Active" : "Paused")
                 }
                 
                 DynamicIslandExpandedRegion(.bottom) {
-                    // Implement expanded view directly
-                    VStack {
-                        Text(context.attributes.sessionName)
-                            .font(.headline)
-                        
-                        // Visual representation of bars
-                        HStack(spacing: 4) {
-                            ForEach(0..<min(8, context.state.barHeights.count), id: \.self) { index in
-                                Rectangle()
-                                    .fill(Color.blue)
-                                    .frame(width: 8, height: context.state.barHeights[index] * 50)
-                                    .animation(.spring(response: 0.3), value: context.state.barHeights[index])
-                            }
+                    // Very simplified version
+                    HStack(spacing: 4) {
+                        ForEach(0..<min(6, context.state.barHeights.count), id: \.self) { index in
+                            Rectangle()
+                                .fill(Color.blue)
+                                .frame(width: 8, height: context.state.barHeights[index] * 40)
                         }
-                        .frame(height: 60)
-                        .padding()
-                        
-                        Text("Intensity: \(Int(context.state.currentIntensity * 100))%")
-                            .font(.caption)
                     }
+                    .padding()
                 }
             } compactLeading: {
-                // Implement compact leading view directly
-                HStack(spacing: 2) {
-                    // Mini visualization of bars
-                    ForEach(0..<min(4, context.state.barHeights.count), id: \.self) { index in
-                        Rectangle()
-                            .fill(Color.white)
-                            .frame(width: 3, height: context.state.barHeights[index] * 15)
-                            .animation(.spring(response: 0.3), value: context.state.barHeights[index])
-                    }
-                }
+                // Simple text for compact leading
+                Text("Sort")
+                    .font(.caption)
             } compactTrailing: {
-                // Implement compact trailing view directly
-                Text(context.state.isPlaying ? "Playing" : "Paused")
-                    .font(.caption2)
-                    .foregroundColor(.white)
-            } minimal: {
-                // Show a simple indicator for minimal view
+                // Simple circle for compact trailing
                 Circle()
                     .fill(context.state.isPlaying ? Color.green : Color.orange)
-                    .frame(width: 20, height: 20)
+                    .frame(width: 10, height: 10)
+            } minimal: {
+                // Minimal view - just a colored circle
+                Circle()
+                    .fill(context.state.isPlaying ? Color.green : Color.orange)
+                    .frame(width: 12, height: 12)
             }
-            .widgetURL(URL(string: "sorting://visualization"))
-            .keylineTint(Color.blue)
         }
     }
 }
@@ -116,7 +80,7 @@ extension VerticalBarsAttributes {
 extension VerticalBarsAttributes.ContentState {
     fileprivate static var sorting: VerticalBarsAttributes.ContentState {
         VerticalBarsAttributes.ContentState(
-            barHeights: [0.5, 0.3, 0.8, 0.2, 0.6, 0.4, 0.7, 0.1],
+            barHeights: [0.5, 0.3, 0.8, 0.2, 0.6, 0.4],
             currentIntensity: 0.7,
             isPlaying: true
         )
@@ -124,7 +88,7 @@ extension VerticalBarsAttributes.ContentState {
     
     fileprivate static var paused: VerticalBarsAttributes.ContentState {
         VerticalBarsAttributes.ContentState(
-            barHeights: [0.5, 0.3, 0.8, 0.2, 0.6, 0.4, 0.7, 0.1],
+            barHeights: [0.5, 0.3, 0.8, 0.2, 0.6, 0.4],
             currentIntensity: 0.3,
             isPlaying: false
         )
