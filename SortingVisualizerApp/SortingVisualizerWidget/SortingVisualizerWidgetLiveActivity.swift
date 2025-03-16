@@ -9,72 +9,131 @@ import ActivityKit
 import WidgetKit
 import SwiftUI
 
-struct SortingVisualizerWidgetAttributes: ActivityAttributes {
-    public struct ContentState: Codable, Hashable {
-        // Dynamic stateful properties about your activity go here!
-        var emoji: String
-    }
-
-    // Fixed non-changing properties about your activity go here!
-    var name: String
-}
-
+// Using our defined VerticalBarsAttributes from the main app
 struct SortingVisualizerWidgetLiveActivity: Widget {
     var body: some WidgetConfiguration {
-        ActivityConfiguration(for: SortingVisualizerWidgetAttributes.self) { context in
+        ActivityConfiguration(for: VerticalBarsAttributes.self) { context in
             // Lock screen/banner UI goes here
             VStack {
-                Text("Hello \(context.state.emoji)")
+                Text(context.attributes.sessionName)
+                    .font(.headline)
+                
+                // Visualization of bars
+                HStack(spacing: 2) {
+                    ForEach(Array(context.state.barHeights.enumerated()), id: \.offset) { index, height in
+                        Rectangle()
+                            .fill(height > 0.7 ? Color.red : Color.blue)
+                            .frame(width: 6, height: CGFloat(height * 50))
+                            .animation(.spring(response: 0.3), value: height)
+                    }
+                }
+                .frame(height: 60)
+                .padding()
+                
+                Text("Intensity: \(Int(context.state.currentIntensity * 100))%")
+                    .font(.caption)
             }
             .activityBackgroundTint(Color.cyan)
             .activitySystemActionForegroundColor(Color.black)
 
         } dynamicIsland: { context in
             DynamicIsland {
-                // Expanded UI goes here.  Compose the expanded UI through
-                // various regions, like leading/trailing/center/bottom
+                // Expanded UI goes here
                 DynamicIslandExpandedRegion(.leading) {
-                    Text("Leading")
+                    VStack {
+                        Text(context.attributes.sessionName)
+                            .font(.caption)
+                        Text(context.state.isPlaying ? "Sorting" : "Paused")
+                            .font(.caption2)
+                    }
                 }
+                
                 DynamicIslandExpandedRegion(.trailing) {
-                    Text("Trailing")
+                    Text("Intensity: \(Int(context.state.currentIntensity * 100))%")
+                        .font(.caption2)
                 }
+                
                 DynamicIslandExpandedRegion(.bottom) {
-                    Text("Bottom \(context.state.emoji)")
-                    // more content
+                    // Implement expanded view directly
+                    VStack {
+                        Text(context.attributes.sessionName)
+                            .font(.headline)
+                        
+                        // Visual representation of bars
+                        HStack(spacing: 4) {
+                            ForEach(0..<min(8, context.state.barHeights.count), id: \.self) { index in
+                                Rectangle()
+                                    .fill(Color.blue)
+                                    .frame(width: 8, height: context.state.barHeights[index] * 50)
+                                    .animation(.spring(response: 0.3), value: context.state.barHeights[index])
+                            }
+                        }
+                        .frame(height: 60)
+                        .padding()
+                        
+                        Text("Intensity: \(Int(context.state.currentIntensity * 100))%")
+                            .font(.caption)
+                    }
                 }
             } compactLeading: {
-                Text("L")
+                // Implement compact leading view directly
+                HStack(spacing: 2) {
+                    // Mini visualization of bars
+                    ForEach(0..<min(4, context.state.barHeights.count), id: \.self) { index in
+                        Rectangle()
+                            .fill(Color.white)
+                            .frame(width: 3, height: context.state.barHeights[index] * 15)
+                            .animation(.spring(response: 0.3), value: context.state.barHeights[index])
+                    }
+                }
             } compactTrailing: {
-                Text("T \(context.state.emoji)")
+                // Implement compact trailing view directly
+                Text(context.state.isPlaying ? "Playing" : "Paused")
+                    .font(.caption2)
+                    .foregroundColor(.white)
             } minimal: {
-                Text(context.state.emoji)
+                // Show a simple indicator for minimal view
+                Circle()
+                    .fill(context.state.isPlaying ? Color.green : Color.orange)
+                    .frame(width: 20, height: 20)
             }
-            .widgetURL(URL(string: "http://www.apple.com"))
-            .keylineTint(Color.red)
+            .widgetURL(URL(string: "sorting://visualization"))
+            .keylineTint(Color.blue)
         }
     }
 }
 
-extension SortingVisualizerWidgetAttributes {
-    fileprivate static var preview: SortingVisualizerWidgetAttributes {
-        SortingVisualizerWidgetAttributes(name: "World")
+// Preview data
+extension VerticalBarsAttributes {
+    fileprivate static var preview: VerticalBarsAttributes {
+        VerticalBarsAttributes(
+            sessionName: "Bubble Sort",
+            startTime: Date()
+        )
     }
 }
 
-extension SortingVisualizerWidgetAttributes.ContentState {
-    fileprivate static var smiley: SortingVisualizerWidgetAttributes.ContentState {
-        SortingVisualizerWidgetAttributes.ContentState(emoji: "😀")
-     }
-     
-     fileprivate static var starEyes: SortingVisualizerWidgetAttributes.ContentState {
-         SortingVisualizerWidgetAttributes.ContentState(emoji: "🤩")
-     }
+extension VerticalBarsAttributes.ContentState {
+    fileprivate static var sorting: VerticalBarsAttributes.ContentState {
+        VerticalBarsAttributes.ContentState(
+            barHeights: [0.5, 0.3, 0.8, 0.2, 0.6, 0.4, 0.7, 0.1],
+            currentIntensity: 0.7,
+            isPlaying: true
+        )
+    }
+    
+    fileprivate static var paused: VerticalBarsAttributes.ContentState {
+        VerticalBarsAttributes.ContentState(
+            barHeights: [0.5, 0.3, 0.8, 0.2, 0.6, 0.4, 0.7, 0.1],
+            currentIntensity: 0.3,
+            isPlaying: false
+        )
+    }
 }
 
-#Preview("Notification", as: .content, using: SortingVisualizerWidgetAttributes.preview) {
+#Preview("Notification", as: .content, using: VerticalBarsAttributes.preview) {
    SortingVisualizerWidgetLiveActivity()
 } contentStates: {
-    SortingVisualizerWidgetAttributes.ContentState.smiley
-    SortingVisualizerWidgetAttributes.ContentState.starEyes
+    VerticalBarsAttributes.ContentState.sorting
+    VerticalBarsAttributes.ContentState.paused
 }

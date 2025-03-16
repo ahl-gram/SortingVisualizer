@@ -86,6 +86,7 @@ struct ContentView: View {
                         arraySize: $arraySize,
                         animationSpeed: $animationSpeed,
                         isAudioEnabled: $viewModel.isAudioEnabled,
+                        isLiveActivityEnabled: $viewModel.isLiveActivityEnabled,
                         selectedAlgorithm: $viewModel.selectedAlgorithm,
                         onRandomize: {
                             viewModel.randomizeArray(size: Int(arraySize))

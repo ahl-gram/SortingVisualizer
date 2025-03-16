@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import ActivityKit
 
 class SortingViewModel: ObservableObject {
     @Published var bars: [SortingBar] = []
@@ -18,10 +19,12 @@ class SortingViewModel: ObservableObject {
     }
     @Published var showCompletionAnimation: Bool = false
     @Published var selectedAlgorithm: SortingAlgorithmType = .bubble
+    @Published var isLiveActivityEnabled: Bool = true
     
     // MARK: - Private properties
     private var sortingTask: Task<Void, Never>?
     private let audioManager = AudioManager()
+    private let liveActivityManager = LiveActivityManager()
     
     // Computed property to detect when bars are being compared
     var hasComparingBars: Bool {
@@ -113,8 +116,21 @@ class SortingViewModel: ObservableObject {
         // Set sorting flag
         isSorting = true
         
+        // Start Live Activity if enabled
+        if isLiveActivityEnabled {
+            let barValues = bars.map { $0.value }
+            liveActivityManager.startLiveActivity(
+                algorithmName: selectedAlgorithm.rawValue.capitalized,
+                barHeights: barValues
+            )
+        }
+        
         // Start a new sorting task based on selected algorithm
         sortingTask = Task {
+            // Add live activity update mechanism
+            let updateInterval = animationSpeed > 0.5 ? 0.5 : animationSpeed * 1.5
+            var lastUpdateTime = Date()
+            
             switch selectedAlgorithm {
             case .bubble:
                 await SortingAlgorithms.bubbleSort(
@@ -123,14 +139,28 @@ class SortingViewModel: ObservableObject {
                     isAudioEnabled: isAudioEnabled,
                     audioManager: audioManager,
                     updateBars: { [weak self] updatedBars in
-                        self?.bars = updatedBars
+                        guard let self = self else { return }
+                        self.bars = updatedBars
+                        
+                        // Update Live Activity periodically
+                        if self.isLiveActivityEnabled && Date().timeIntervalSince(lastUpdateTime) > updateInterval {
+                            let barValues = updatedBars.map { $0.value }
+                            self.liveActivityManager.updateLiveActivity(barHeights: barValues)
+                            lastUpdateTime = Date()
+                        }
                     },
                     markAllAsSorted: { [weak self] in
                         self?.markAllAsSorted()
                     },
                     onComplete: { [weak self] in
-                        self?.showCompletionAnimation = true
-                        self?.isSorting = false
+                        guard let self = self else { return }
+                        self.showCompletionAnimation = true
+                        self.isSorting = false
+                        
+                        // End live activity when sorting is complete
+                        if self.isLiveActivityEnabled {
+                            self.liveActivityManager.endLiveActivity()
+                        }
                     }
                 )
             case .quick:
@@ -140,14 +170,28 @@ class SortingViewModel: ObservableObject {
                     isAudioEnabled: isAudioEnabled,
                     audioManager: audioManager,
                     updateBars: { [weak self] updatedBars in
-                        self?.bars = updatedBars
+                        guard let self = self else { return }
+                        self.bars = updatedBars
+                        
+                        // Update Live Activity periodically
+                        if self.isLiveActivityEnabled && Date().timeIntervalSince(lastUpdateTime) > updateInterval {
+                            let barValues = updatedBars.map { $0.value }
+                            self.liveActivityManager.updateLiveActivity(barHeights: barValues)
+                            lastUpdateTime = Date()
+                        }
                     },
                     markAllAsSorted: { [weak self] in
                         self?.markAllAsSorted()
                     },
                     onComplete: { [weak self] in
-                        self?.showCompletionAnimation = true
-                        self?.isSorting = false
+                        guard let self = self else { return }
+                        self.showCompletionAnimation = true
+                        self.isSorting = false
+                        
+                        // End live activity when sorting is complete
+                        if self.isLiveActivityEnabled {
+                            self.liveActivityManager.endLiveActivity()
+                        }
                     }
                 )
             case .merge:
@@ -157,14 +201,28 @@ class SortingViewModel: ObservableObject {
                     isAudioEnabled: isAudioEnabled,
                     audioManager: audioManager,
                     updateBars: { [weak self] updatedBars in
-                        self?.bars = updatedBars
+                        guard let self = self else { return }
+                        self.bars = updatedBars
+                        
+                        // Update Live Activity periodically
+                        if self.isLiveActivityEnabled && Date().timeIntervalSince(lastUpdateTime) > updateInterval {
+                            let barValues = updatedBars.map { $0.value }
+                            self.liveActivityManager.updateLiveActivity(barHeights: barValues)
+                            lastUpdateTime = Date()
+                        }
                     },
                     markAllAsSorted: { [weak self] in
                         self?.markAllAsSorted()
                     },
                     onComplete: { [weak self] in
-                        self?.showCompletionAnimation = true
-                        self?.isSorting = false
+                        guard let self = self else { return }
+                        self.showCompletionAnimation = true
+                        self.isSorting = false
+                        
+                        // End live activity when sorting is complete
+                        if self.isLiveActivityEnabled {
+                            self.liveActivityManager.endLiveActivity()
+                        }
                     }
                 )
             }
@@ -176,6 +234,13 @@ class SortingViewModel: ObservableObject {
         sortingTask = nil
         isSorting = false
         showCompletionAnimation = false
+        
+        // Pause or end the live activity when sorting stops
+        if isLiveActivityEnabled {
+            if ActivityAuthorizationInfo().areActivitiesEnabled {
+                liveActivityManager.pauseLiveActivity()
+            }
+        }
         
         // Reset all bars to unsorted state
         for i in 0..<bars.count {
@@ -200,5 +265,6 @@ class SortingViewModel: ObservableObject {
     
     deinit {
         audioManager.cleanup()
+        liveActivityManager.endLiveActivity()
     }
 } 

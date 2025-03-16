@@ -11,6 +11,7 @@ struct ControlPanelView: View {
     @Binding var arraySize: Double
     @Binding var animationSpeed: Double
     @Binding var isAudioEnabled: Bool
+    @Binding var isLiveActivityEnabled: Bool
     @Binding var selectedAlgorithm: SortingAlgorithmType
     var onRandomize: () -> Void
     var onStartSorting: () -> Void
@@ -73,6 +74,12 @@ struct ControlPanelView: View {
                             Text("Audio Feedback")
                         }
                         .accessibilityLabel("Audio Feedback Toggle")
+                        
+                        // Live Activity Toggle
+                        Toggle(isOn: $isLiveActivityEnabled) {
+                            Text("Dynamic Island")
+                        }
+                        .accessibilityLabel("Live Activity Toggle")
                         
                         Spacer()
                         
@@ -178,6 +185,14 @@ struct ControlPanelView: View {
                     .accessibilityLabel("Audio Feedback Toggle")
                     .accessibilityHint("Toggle to enable or disable audio feedback during sorting")
                     
+                    // Live Activity Toggle
+                    Toggle(isOn: $isLiveActivityEnabled) {
+                        Text("Dynamic Island")
+                    }
+                    .padding(.vertical, 2)
+                    .accessibilityLabel("Live Activity Toggle")
+                    .accessibilityHint("Toggle to enable or disable Live Activity feature")
+                    
                     // Buttons row
                     HStack(spacing: 10) {
                         // Randomize Array Button
@@ -229,12 +244,14 @@ struct ControlPanelView: View {
     @State var previewArraySize: Double = 50
     @State var previewAnimationSpeed: Double = 1.0
     @State var previewAudioEnabled: Bool = true
+    @State var previewLiveActivityEnabled: Bool = true
     @State var previewSelectedAlgorithm: SortingAlgorithmType = .bubble
     
     return ControlPanelView(
         arraySize: $previewArraySize,
         animationSpeed: $previewAnimationSpeed,
         isAudioEnabled: $previewAudioEnabled,
+        isLiveActivityEnabled: $previewLiveActivityEnabled,
         selectedAlgorithm: $previewSelectedAlgorithm,
         onRandomize: { print("Randomize tapped") },
         onStartSorting: { print("Start Sorting tapped") },
@@ -249,12 +266,14 @@ struct ControlPanelView: View {
     @State var previewArraySize: Double = 50
     @State var previewAnimationSpeed: Double = 1.0
     @State var previewAudioEnabled: Bool = true
+    @State var previewLiveActivityEnabled: Bool = true
     @State var previewSelectedAlgorithm: SortingAlgorithmType = .bubble
     
     return ControlPanelView(
         arraySize: $previewArraySize,
         animationSpeed: $previewAnimationSpeed,
         isAudioEnabled: $previewAudioEnabled,
+        isLiveActivityEnabled: $previewLiveActivityEnabled,
         selectedAlgorithm: $previewSelectedAlgorithm,
         onRandomize: { print("Randomize tapped") },
         onStartSorting: { print("Start Sorting tapped") },
