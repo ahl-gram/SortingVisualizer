@@ -49,9 +49,9 @@ struct ControlPanelView: View {
                         
                         // Audio Toggle
                         Toggle(isOn: $isAudioEnabled) {
-                            Text("Audio Feedback")
+                            Text("Sound Effects")
                         }
-                        .accessibilityLabel("Audio Feedback Toggle")
+                        .accessibilityLabel("Sound Effects Toggle")
                         .padding(.top, 5)
                     }
                     .frame(maxWidth: .infinity)
@@ -162,8 +162,8 @@ struct ControlPanelView: View {
                         Toggle(isOn: $isAudioEnabled) {
                             Text("Audio")
                         }
-                        .accessibilityLabel("Audio Feedback Toggle")
-                        .accessibilityHint("Toggle to enable or disable audio feedback during sorting")
+                        .accessibilityLabel("Sound Effects Toggle")
+                        .accessibilityHint("Toggle to enable or disable sound effects during sorting")
                         .frame(width: 100)
                     }
                     
