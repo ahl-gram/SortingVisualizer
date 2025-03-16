@@ -108,100 +108,30 @@ class SortingViewModel: ObservableObject {
         
         // Start a new sorting task based on selected algorithm
         sortingTask = Task {
-            switch selectedAlgorithm {
-            case .bubble:
-                await SortingAlgorithms.bubbleSort(
-                    bars: bars,
-                    animationSpeed: animationSpeed,
-                    isAudioEnabled: isAudioEnabled,
-                    audioManager: audioManager,
-                    updateBars: { [weak self] updatedBars in
-                        self?.bars = updatedBars
-                    },
-                    markAllAsSorted: { [weak self] in
-                        self?.markAllAsSorted()
-                    },
-                    onComplete: { [weak self] in
-                        guard let self = self else { return }
-                        // Run the completion animation before marking sort as done
-                        Task {
-                            await self.playCompletionAnimation(animationSpeed: animationSpeed)
-                            await MainActor.run {
-                                self.isSorting = false
-                            }
+            // Use the generic sorting algorithm method
+            await SortingAlgorithms.runSortingAlgorithm(
+                type: selectedAlgorithm,
+                bars: bars,
+                animationSpeed: animationSpeed,
+                isAudioEnabled: isAudioEnabled,
+                audioManager: audioManager,
+                updateBars: { [weak self] updatedBars in
+                    self?.bars = updatedBars
+                },
+                markAllAsSorted: { [weak self] in
+                    self?.markAllAsSorted()
+                },
+                onComplete: { [weak self] in
+                    guard let self = self else { return }
+                    // Run the completion animation before marking sort as done
+                    Task {
+                        await self.playCompletionAnimation(animationSpeed: animationSpeed)
+                        await MainActor.run {
+                            self.isSorting = false
                         }
                     }
-                )
-            case .quick:
-                await SortingAlgorithms.quickSort(
-                    bars: bars,
-                    animationSpeed: animationSpeed,
-                    isAudioEnabled: isAudioEnabled,
-                    audioManager: audioManager,
-                    updateBars: { [weak self] updatedBars in
-                        self?.bars = updatedBars
-                    },
-                    markAllAsSorted: { [weak self] in
-                        self?.markAllAsSorted()
-                    },
-                    onComplete: { [weak self] in
-                        guard let self = self else { return }
-                        // Run the completion animation before marking sort as done
-                        Task {
-                            await self.playCompletionAnimation(animationSpeed: animationSpeed)
-                            await MainActor.run {
-                                self.isSorting = false
-                            }
-                        }
-                    }
-                )
-            case .merge:
-                await SortingAlgorithms.mergeSort(
-                    bars: bars,
-                    animationSpeed: animationSpeed,
-                    isAudioEnabled: isAudioEnabled,
-                    audioManager: audioManager,
-                    updateBars: { [weak self] updatedBars in
-                        self?.bars = updatedBars
-                    },
-                    markAllAsSorted: { [weak self] in
-                        self?.markAllAsSorted()
-                    },
-                    onComplete: { [weak self] in
-                        guard let self = self else { return }
-                        // Run the completion animation before marking sort as done
-                        Task {
-                            await self.playCompletionAnimation(animationSpeed: animationSpeed)
-                            await MainActor.run {
-                                self.isSorting = false
-                            }
-                        }
-                    }
-                )
-            case .insertion:
-                await SortingAlgorithms.insertionSort(
-                    bars: bars,
-                    animationSpeed: animationSpeed,
-                    isAudioEnabled: isAudioEnabled,
-                    audioManager: audioManager,
-                    updateBars: { [weak self] updatedBars in
-                        self?.bars = updatedBars
-                    },
-                    markAllAsSorted: { [weak self] in
-                        self?.markAllAsSorted()
-                    },
-                    onComplete: { [weak self] in
-                        guard let self = self else { return }
-                        // Run the completion animation before marking sort as done
-                        Task {
-                            await self.playCompletionAnimation(animationSpeed: animationSpeed)
-                            await MainActor.run {
-                                self.isSorting = false
-                            }
-                        }
-                    }
-                )
-            }
+                }
+            )
         }
     }
     

@@ -268,10 +268,11 @@ enum SortingAlgorithms {
         }
     }
     
-    // MARK: - Sorting Algorithms
+    // MARK: - Generic Sorting Method
     
-    // Bubble sort implementation
-    static func bubbleSort(
+    /// Generic method to run any sorting algorithm
+    static func runSortingAlgorithm(
+        type: SortingAlgorithmType,
         bars: [SortingViewModel.SortingBar],
         animationSpeed: Double,
         isAudioEnabled: Bool,
@@ -296,133 +297,55 @@ enum SortingAlgorithms {
         // Extract bar values for sorting
         let values = localBars.map { $0.value }
         
-        // Run the pure sorting algorithm with visualization steps
-        _ = await SortingLogic.bubbleSort(array: values) { step, _ in
-            await processSortingStep(
-                step: step,
-                bars: &localBars,
-                params: params,
-                markAllAsSorted: markAllAsSorted,
-                onComplete: onComplete,
-                scaledDelay: scaledDelay
-            )
-        }
-    }
-    
-    // Quick sort implementation
-    static func quickSort(
-        bars: [SortingViewModel.SortingBar],
-        animationSpeed: Double,
-        isAudioEnabled: Bool,
-        audioManager: AudioManager,
-        updateBars: @escaping ([SortingViewModel.SortingBar]) -> Void,
-        markAllAsSorted: @escaping () -> Void,
-        onComplete: @escaping () -> Void
-    ) async {
-        var localBars = bars
-        
-        // Create params struct for helper methods
-        let params = SortingParams(
-            animationSpeed: animationSpeed,
-            isAudioEnabled: isAudioEnabled,
-            audioManager: audioManager,
-            updateBars: updateBars
-        )
-        
-        // Calculate delay once
-        let scaledDelay = calculateDelay(animationSpeed: animationSpeed)
-        
-        // Extract bar values for sorting
-        let values = localBars.map { $0.value }
-        
-        // Run the pure sorting algorithm with visualization steps
-        _ = await SortingLogic.quickSort(array: values) { step, _ in
-            await processSortingStep(
-                step: step,
-                bars: &localBars,
-                params: params,
-                markAllAsSorted: markAllAsSorted,
-                onComplete: onComplete,
-                scaledDelay: scaledDelay
-            )
-        }
-    }
-    
-    // Merge sort implementation
-    static func mergeSort(
-        bars: [SortingViewModel.SortingBar],
-        animationSpeed: Double,
-        isAudioEnabled: Bool,
-        audioManager: AudioManager,
-        updateBars: @escaping ([SortingViewModel.SortingBar]) -> Void,
-        markAllAsSorted: @escaping () -> Void,
-        onComplete: @escaping () -> Void
-    ) async {
-        var localBars = bars
-        
-        // Create params struct for helper methods
-        let params = SortingParams(
-            animationSpeed: animationSpeed,
-            isAudioEnabled: isAudioEnabled,
-            audioManager: audioManager,
-            updateBars: updateBars
-        )
-        
-        // Calculate delay once
-        let scaledDelay = calculateDelay(animationSpeed: animationSpeed)
-        
-        // Extract bar values for sorting
-        let values = localBars.map { $0.value }
-        
-        // Run the pure sorting algorithm with visualization steps
-        _ = await SortingLogic.mergeSort(array: values) { step, _ in
-            await processSortingStep(
-                step: step,
-                bars: &localBars,
-                params: params,
-                markAllAsSorted: markAllAsSorted,
-                onComplete: onComplete,
-                scaledDelay: scaledDelay
-            )
-        }
-    }
-    
-    // Insertion sort implementation
-    static func insertionSort(
-        bars: [SortingViewModel.SortingBar],
-        animationSpeed: Double,
-        isAudioEnabled: Bool,
-        audioManager: AudioManager,
-        updateBars: @escaping ([SortingViewModel.SortingBar]) -> Void,
-        markAllAsSorted: @escaping () -> Void,
-        onComplete: @escaping () -> Void
-    ) async {
-        var localBars = bars
-        
-        // Create params struct for helper methods
-        let params = SortingParams(
-            animationSpeed: animationSpeed,
-            isAudioEnabled: isAudioEnabled,
-            audioManager: audioManager,
-            updateBars: updateBars
-        )
-        
-        // Calculate delay once
-        let scaledDelay = calculateDelay(animationSpeed: animationSpeed)
-        
-        // Extract bar values for sorting
-        let values = localBars.map { $0.value }
-        
-        // Run the pure sorting algorithm with visualization steps
-        _ = await SortingLogic.insertionSort(array: values) { step, _ in
-            await processSortingStep(
-                step: step,
-                bars: &localBars,
-                params: params,
-                markAllAsSorted: markAllAsSorted,
-                onComplete: onComplete,
-                scaledDelay: scaledDelay
-            )
+        // Run the appropriate sorting algorithm based on the type
+        switch type {
+        case .bubble:
+            _ = await SortingLogic.bubbleSort(array: values) { step, _ in
+                await processSortingStep(
+                    step: step,
+                    bars: &localBars,
+                    params: params,
+                    markAllAsSorted: markAllAsSorted,
+                    onComplete: onComplete,
+                    scaledDelay: scaledDelay
+                )
+            }
+            
+        case .quick:
+            _ = await SortingLogic.quickSort(array: values) { step, _ in
+                await processSortingStep(
+                    step: step,
+                    bars: &localBars,
+                    params: params,
+                    markAllAsSorted: markAllAsSorted,
+                    onComplete: onComplete,
+                    scaledDelay: scaledDelay
+                )
+            }
+            
+        case .merge:
+            _ = await SortingLogic.mergeSort(array: values) { step, _ in
+                await processSortingStep(
+                    step: step,
+                    bars: &localBars,
+                    params: params,
+                    markAllAsSorted: markAllAsSorted,
+                    onComplete: onComplete,
+                    scaledDelay: scaledDelay
+                )
+            }
+            
+        case .insertion:
+            _ = await SortingLogic.insertionSort(array: values) { step, _ in
+                await processSortingStep(
+                    step: step,
+                    bars: &localBars,
+                    params: params,
+                    markAllAsSorted: markAllAsSorted,
+                    onComplete: onComplete,
+                    scaledDelay: scaledDelay
+                )
+            }
         }
     }
 } 
