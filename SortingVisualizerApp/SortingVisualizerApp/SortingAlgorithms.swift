@@ -21,15 +21,15 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
     var description: String {
         switch self {
         case .bubble:
-            return "A simple comparison-based algorithm that repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order."
+            return "A simple comparison-based sort that repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order."
         case .quick:
-            return "A divide-and-conquer algorithm that works by selecting a 'pivot' element and partitioning the array around the pivot."
+            return "A divide-and-conquer sort that works by selecting a 'pivot' element and partitioning the array around the pivot."
         case .merge:
-            return "An efficient, stable, divide-and-conquer algorithm that divides the array into halves, sorts them separately, and then merges the sorted halves."
+            return "An efficient, stable, divide-and-conquer sort that divides the array into halves, sorts them separately, and then merges the sorted halves."
         case .insertion:
-            return "A simple sorting algorithm that builds the final sorted array one item at a time, similar to how people sort playing cards in their hands."
+            return "A simple sort that builds the final sorted array one item at a time, similar to how people sort playing cards in their hands."
         case .heap:
-            return "A comparison-based sorting algorithm that uses a binary heap data structure. It transforms the array into a heap, then repeatedly extracts the maximum element and rebuilds the heap."
+            return "A comparison-based sort that uses a binary heap data structure. It transforms the array into a heap, then repeatedly extracts the maximum element and rebuilds the heap."
         }
     }
 }
