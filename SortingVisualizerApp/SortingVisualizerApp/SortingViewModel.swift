@@ -21,6 +21,7 @@ class SortingViewModel: ObservableObject {
     // MARK: - Private properties
     private var sortingTask: Task<Void, Never>?
     private let audioManager = AudioManager()
+    private var currentAnimationSpeed: Double = 1.0
     
     // Computed property to detect when bars are being compared
     var hasComparingBars: Bool {
@@ -106,6 +107,9 @@ class SortingViewModel: ObservableObject {
         // Set sorting flag
         isSorting = true
         
+        // Store the current animation speed
+        currentAnimationSpeed = animationSpeed
+        
         // Start a new sorting task based on selected algorithm
         sortingTask = Task {
             // Use the generic sorting algorithm method
@@ -143,6 +147,48 @@ class SortingViewModel: ObservableObject {
         // Reset all bars to unsorted state
         for i in 0..<bars.count {
             bars[i].state = .unsorted
+        }
+    }
+    
+    func updateAnimationSpeed(_ speed: Double) {
+        currentAnimationSpeed = speed
+        
+        // If currently sorting, restart the sorting with the new speed
+        if isSorting {
+            // Store current bars state
+            let currentBars = bars
+            
+            // Cancel current sorting task
+            sortingTask?.cancel()
+            sortingTask = nil
+            
+            // Start a new sorting task with the updated speed
+            sortingTask = Task {
+                // Use the generic sorting algorithm method
+                await SortingVisualizers.runSortingAlgorithm(
+                    type: selectedAlgorithm,
+                    bars: currentBars,
+                    animationSpeed: speed,
+                    isAudioEnabled: isAudioEnabled,
+                    audioManager: audioManager,
+                    updateBars: { [weak self] updatedBars in
+                        self?.bars = updatedBars
+                    },
+                    markAllAsSorted: { [weak self] in
+                        self?.markAllAsSorted()
+                    },
+                    onComplete: { [weak self] in
+                        guard let self = self else { return }
+                        // Run the completion animation before marking sort as done
+                        Task {
+                            await self.playCompletionAnimation(animationSpeed: speed)
+                            await MainActor.run {
+                                self.isSorting = false
+                            }
+                        }
+                    }
+                )
+            }
         }
     }
     

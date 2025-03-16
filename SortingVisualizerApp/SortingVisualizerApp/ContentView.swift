@@ -123,6 +123,12 @@ struct ContentView: View {
                         viewModel.randomizeArray(size: Int(newSize))
                     }
                 }
+                .onChange(of: animationSpeed) { newSpeed in
+                    // Update animation speed in real-time if sorting is in progress
+                    if viewModel.isSorting {
+                        viewModel.updateAnimationSpeed(newSpeed)
+                    }
+                }
             }
         }
         .respectSafeAreas() // Use our custom modifier instead of ignoring safe areas
