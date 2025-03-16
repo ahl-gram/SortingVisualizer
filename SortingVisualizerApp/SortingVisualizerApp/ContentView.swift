@@ -16,16 +16,16 @@ struct ContentView: View {
     @State private var arraySizeDebounceTimer: Timer?
     
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                // Add safe area insets reader to capture dynamic island and other insets
+        // Put this in a NavigationView
+        NavigationView {
+            GeometryReader { geometry in
+                ZStack {
+                    // Add safe area insets reader to capture dynamic island and other insets
                 SafeAreaInsetsReader(insets: $safeAreaInsets)
                 
                 VStack(spacing: 0) {
-                    Text("Sorting Visualizer")
-                        .font(.title)
-                        .padding(.top, 5)
-                    
+                    // add a spacer to the top of the view
+                    Spacer()
                     // Sorting visualization area with proper insets
                     if viewModel.bars.isEmpty {
                         Text("Press 'Randomize Array' to start")
@@ -131,6 +131,8 @@ struct ContentView: View {
             }
         }
         .respectSafeAreas() // Use our custom modifier instead of ignoring safe areas
+        .navigationTitle("Sorting Visualizer")
+        }
     }
 }
 
