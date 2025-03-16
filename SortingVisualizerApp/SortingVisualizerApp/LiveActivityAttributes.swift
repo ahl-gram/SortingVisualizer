@@ -8,16 +8,15 @@
 import ActivityKit
 import Foundation
 
-struct DeliveryAttributes: ActivityAttributes {
+struct VerticalBarsAttributes: ActivityAttributes {
     public struct ContentState: Codable, Hashable {
-        // Define the dynamic content that can change over time
-        var status: String
-        var progress: Double
-        
-        // Add more properties as needed for your animation
+        // Properties that will change as your vertical bars move
+        var barHeights: [Double] // Array of heights for your vertical bars
+        var currentIntensity: Double // Overall intensity/amplitude
+        var isPlaying: Bool // If your visualization is active
     }
     
-    // Define static content that doesn't change
-    var orderNumber: String
-    var estimatedDelivery: Date
+    // Static properties that don't change during the activity
+    var sessionName: String
+    var startTime: Date
 }
