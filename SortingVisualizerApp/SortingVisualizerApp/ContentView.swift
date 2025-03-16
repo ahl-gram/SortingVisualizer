@@ -16,10 +16,9 @@ struct ContentView: View {
     @State private var arraySizeDebounceTimer: Timer?
     
     var body: some View {
-        // Put this in a NavigationView
-        NavigationView {
-            GeometryReader { geometry in
-                ZStack {
+        // Remove the NavigationView
+        GeometryReader { geometry in
+            ZStack {
                     // Add safe area insets reader to capture dynamic island and other insets
                 SafeAreaInsetsReader(insets: $safeAreaInsets)
                 
@@ -134,7 +133,6 @@ struct ContentView: View {
         .navigationTitle("Sorting Visualizer")
         }
     }
-}
 
 #Preview {
     ContentView()
