@@ -27,15 +27,16 @@ struct ControlPanelView: View {
                         Text("Controls")
                             .font(.headline)
                         
-                        // Algorithm Picker
+                        // Algorithm Picker - Dropdown style
                         HStack {
                             Text("Algorithm:")
-                            Picker("Algorithm", selection: $selectedAlgorithm) {
+                            Spacer()
+                            Picker("Select Algorithm", selection: $selectedAlgorithm) {
                                 ForEach(SortingAlgorithmType.allCases) { algorithm in
                                     Text(algorithm.rawValue).tag(algorithm)
                                 }
                             }
-                            .pickerStyle(SegmentedPickerStyle())
+                            .frame(width: 180)
                             .disabled(isSorting)
                             .accessibilityLabel("Algorithm Selector")
                         }
@@ -140,17 +141,16 @@ struct ControlPanelView: View {
                     HStack(alignment: .top) {
                         // Left side - Algorithm picker and description
                         VStack(alignment: .leading, spacing: 5) {
-                            // Algorithm Picker
+                            // Algorithm Picker - Dropdown style
                             HStack {
                                 Text("Algorithm:")
                                 Spacer()
-                                Picker("Algorithm", selection: $selectedAlgorithm) {
+                                Picker("Select Algorithm", selection: $selectedAlgorithm) {
                                     ForEach(SortingAlgorithmType.allCases) { algorithm in
                                         Text(algorithm.rawValue).tag(algorithm)
                                     }
                                 }
-                                .pickerStyle(SegmentedPickerStyle())
-                                .frame(maxWidth: 240)
+                                .frame(width: 140)
                                 .disabled(isSorting)
                                 .accessibilityLabel("Algorithm Selector")
                             }
