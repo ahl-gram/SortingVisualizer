@@ -107,11 +107,11 @@ struct ControlPanelView: View {
                         HStack {
                             Text("Animation Speed:")
                             Spacer()
-                            Text("\(String(format: "%.1f", animationSpeed))x")
+                            Text("\(Int(animationSpeed))x")
                                 .frame(width: 40, alignment: .trailing)
                         }
                         
-                        Slider(value: $animationSpeed, in: 0.1...20.0, step: 0.1)
+                        Slider(value: $animationSpeed, in: 1...20, step: 1)
                             .accessibilityLabel("Animation Speed Slider")
                         
                         Spacer()
@@ -223,11 +223,11 @@ struct ControlPanelView: View {
                             HStack {
                                 Text("Animation Speed:")
                                 Spacer()
-                                Text("\(String(format: "%.1f", animationSpeed))x")
+                                Text("\(Int(animationSpeed))x")
                                     .frame(width: 40, alignment: .trailing)
                             }
                             
-                            Slider(value: $animationSpeed, in: 0.1...20.0, step: 0.1)
+                            Slider(value: $animationSpeed, in: 1...20, step: 1)
                                 .accessibilityLabel("Animation Speed Slider")
                                 .accessibilityHint("Adjust to change the speed of the sorting animation")
                         }
