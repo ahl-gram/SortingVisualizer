@@ -100,7 +100,6 @@ struct ContentView: View {
                     )
                     .padding(.horizontal, 5)
                     .padding(.bottom, 5)
-                    .background(Color.black.opacity(0.1))
                     // Set minimum height for the control panel to ensure all controls are visible
                     .frame(minHeight: 220)
                 }
