@@ -123,16 +123,6 @@ struct ContentView: View {
                         viewModel.randomizeArray(size: Int(newSize))
                     }
                 }
-                
-                // Show completion animation when sorting is complete
-                if viewModel.showCompletionAnimation {
-                    CompletionAnimationView()
-                        .onTapGesture {
-                            withAnimation {
-                                viewModel.showCompletionAnimation = false
-                            }
-                        }
-                }
             }
         }
         .respectSafeAreas() // Use our custom modifier instead of ignoring safe areas

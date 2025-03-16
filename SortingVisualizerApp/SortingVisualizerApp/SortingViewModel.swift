@@ -16,7 +16,6 @@ class SortingViewModel: ObservableObject {
             audioManager.setAudioEnabled(isAudioEnabled)
         }
     }
-    @Published var showCompletionAnimation: Bool = false
     @Published var selectedAlgorithm: SortingAlgorithmType = .bubble
     
     // MARK: - Private properties
@@ -38,9 +37,6 @@ class SortingViewModel: ObservableObject {
     func randomizeArray(size: Int) {
         // Stop any ongoing sorting
         stopSorting()
-        
-        // Reset completion animation flag
-        showCompletionAnimation = false
         
         // Generate a new array of bars with unique, uniformly distributed heights
         var newBars: [SortingBar] = []
@@ -107,9 +103,6 @@ class SortingViewModel: ObservableObject {
         // Cancel any existing sorting task
         stopSorting()
         
-        // Reset completion animation flag
-        showCompletionAnimation = false
-        
         // Set sorting flag
         isSorting = true
         
@@ -129,8 +122,14 @@ class SortingViewModel: ObservableObject {
                         self?.markAllAsSorted()
                     },
                     onComplete: { [weak self] in
-                        self?.showCompletionAnimation = true
-                        self?.isSorting = false
+                        guard let self = self else { return }
+                        // Run the completion animation before marking sort as done
+                        Task {
+                            await self.playCompletionAnimation(animationSpeed: animationSpeed)
+                            await MainActor.run {
+                                self.isSorting = false
+                            }
+                        }
                     }
                 )
             case .quick:
@@ -146,8 +145,14 @@ class SortingViewModel: ObservableObject {
                         self?.markAllAsSorted()
                     },
                     onComplete: { [weak self] in
-                        self?.showCompletionAnimation = true
-                        self?.isSorting = false
+                        guard let self = self else { return }
+                        // Run the completion animation before marking sort as done
+                        Task {
+                            await self.playCompletionAnimation(animationSpeed: animationSpeed)
+                            await MainActor.run {
+                                self.isSorting = false
+                            }
+                        }
                     }
                 )
             case .merge:
@@ -163,8 +168,14 @@ class SortingViewModel: ObservableObject {
                         self?.markAllAsSorted()
                     },
                     onComplete: { [weak self] in
-                        self?.showCompletionAnimation = true
-                        self?.isSorting = false
+                        guard let self = self else { return }
+                        // Run the completion animation before marking sort as done
+                        Task {
+                            await self.playCompletionAnimation(animationSpeed: animationSpeed)
+                            await MainActor.run {
+                                self.isSorting = false
+                            }
+                        }
                     }
                 )
             }
@@ -175,12 +186,62 @@ class SortingViewModel: ObservableObject {
         sortingTask?.cancel()
         sortingTask = nil
         isSorting = false
-        showCompletionAnimation = false
         
         // Reset all bars to unsorted state
         for i in 0..<bars.count {
             bars[i].state = .unsorted
         }
+    }
+    
+    /// Highlights bars in order from shortest to tallest with a sequential animation
+    private func playCompletionAnimation(animationSpeed: Double) async {
+        // First, reset all bars to "sorted" state
+        await MainActor.run {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                for i in 0..<bars.count {
+                    bars[i].state = .sorted
+                }
+            }
+        }
+        
+        // Calculate the base delay - faster animation for higher speeds
+        let baseDelay = UInt64(500_000_000 / animationSpeed) // nanoseconds
+        
+        // Create a copy of bars sorted by height (shortest to tallest)
+        let sortedBars = bars.sorted { $0.value < $1.value }
+        
+        // Find indices of sorted bars in the original array
+        let sortedIndices = sortedBars.compactMap { sortedBar in
+            bars.firstIndex { $0.id == sortedBar.id }
+        }
+        
+        // Highlight each bar in sequence from shortest to tallest
+        for index in sortedIndices {
+            // Set bar to comparing state (which will show as green highlight)
+            await MainActor.run {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    bars[index].state = .comparing
+                }
+                
+                // Play tone based on bar height
+                if isAudioEnabled {
+                    audioManager.playTone(forValue: bars[index].value)
+                }
+            }
+            
+            // Wait before highlighting the next bar
+            try? await Task.sleep(nanoseconds: baseDelay)
+            
+            // Set back to sorted state
+            await MainActor.run {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    bars[index].state = .sorted
+                }
+            }
+        }
+        
+        // Final pause to appreciate the completed sort
+        try? await Task.sleep(nanoseconds: baseDelay * 2)
     }
     
     private func markAllAsSorted() {
