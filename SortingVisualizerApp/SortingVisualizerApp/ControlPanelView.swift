@@ -18,8 +18,7 @@ struct ControlPanelView: View {
     var isSorting: Bool
     
     var body: some View {
-            // Wide landscape layout - horizontal arrangement
-            WideLandscapeControlPanelLayout(
+            ControlPanelLayout(
                 arraySize: $arraySize,
                 animationSpeed: $animationSpeed,
                 isAudioEnabled: $isAudioEnabled,
@@ -58,10 +57,6 @@ struct ControlPanelPreviewWrapper: View {
     }
 }
 
-#Preview("Standard") {
-    ControlPanelPreviewWrapper(width: 500, height: 300)
-}
-
-#Preview("Wide Landscape") {
+#Preview("Landscape") {
     ControlPanelPreviewWrapper(width: 700, height: 200)
 } 

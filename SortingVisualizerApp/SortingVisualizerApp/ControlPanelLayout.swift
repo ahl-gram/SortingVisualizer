@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct WideLandscapeControlPanelLayout: View {
+struct ControlPanelLayout: View {
     @Binding var arraySize: Double
     @Binding var animationSpeed: Double
     @Binding var isAudioEnabled: Bool
@@ -163,18 +163,18 @@ struct WideLandscapeControlPanelLayout: View {
 }
 
 #Preview {
-    WideLandscapeControlPanelPreview()
+    ControlPanelPreview()
 }
 
 // Preview wrapper
-struct WideLandscapeControlPanelPreview: View {
+struct ControlPanelPreview: View {
     @State private var arraySize: Double = 50
     @State private var animationSpeed: Double = 1.0
     @State private var isAudioEnabled: Bool = true
     @State private var selectedAlgorithm: SortingAlgorithmType = .bubble
     
     var body: some View {
-        WideLandscapeControlPanelLayout(
+        ControlPanelLayout(
             arraySize: $arraySize,
             animationSpeed: $animationSpeed,
             isAudioEnabled: $isAudioEnabled,
