@@ -31,12 +31,6 @@ enum AppConstants {
     
     // MARK: - Audio Constants
     enum Audio {
-        /// Base frequency for the lowest note (Hz)
-        static let baseFrequency: Float = 116.5 // A3 note
-        
-        /// Maximum frequency range (Hz)
-        static let frequencyRange: Float = 349.66 // Range from baseFrequency to baseFrequency + range
-        
         /// Maximum possible bar value used for normalization
         static let maxBarValue: Int = 200
         
