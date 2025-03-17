@@ -18,35 +18,20 @@ struct ControlPanelView: View {
     var isSorting: Bool
     
     var body: some View {
-        GeometryReader { geometry in
-            if geometry.size.width > 600 {
-                // Wide landscape layout - horizontal arrangement
-                WideLandscapeControlPanelLayout(
-                    arraySize: $arraySize,
-                    animationSpeed: $animationSpeed,
-                    isAudioEnabled: $isAudioEnabled,
-                    selectedAlgorithm: $selectedAlgorithm,
-                    onRandomize: onRandomize,
-                    onStartSorting: onStartSorting,
-                    onStopSorting: onStopSorting,
-                    isSorting: isSorting
-                )
-            } else {
-                // Standard layout for smaller screens
-                StandardControlPanelLayout(
-                    arraySize: $arraySize,
-                    animationSpeed: $animationSpeed,
-                    isAudioEnabled: $isAudioEnabled,
-                    selectedAlgorithm: $selectedAlgorithm,
-                    onRandomize: onRandomize,
-                    onStartSorting: onStartSorting,
-                    onStopSorting: onStopSorting,
-                    isSorting: isSorting
-                )
-            }
+            // Wide landscape layout - horizontal arrangement
+            WideLandscapeControlPanelLayout(
+                arraySize: $arraySize,
+                animationSpeed: $animationSpeed,
+                isAudioEnabled: $isAudioEnabled,
+                selectedAlgorithm: $selectedAlgorithm,
+                onRandomize: onRandomize,
+                onStartSorting: onStartSorting,
+                onStopSorting: onStopSorting,
+                isSorting: isSorting
+            )
         }
     }
-}
+
 
 // Preview wrapper
 struct ControlPanelPreviewWrapper: View {
