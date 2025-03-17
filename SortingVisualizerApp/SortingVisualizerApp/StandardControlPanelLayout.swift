@@ -10,6 +10,7 @@ struct StandardControlPanelLayout: View {
     var onStopSorting: () -> Void
     var isSorting: Bool
     
+    // MIGHT NOT NEED THIS
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             // Top row with algorithm picker and audio toggle
