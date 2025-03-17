@@ -204,7 +204,7 @@ class SortingViewModel: ObservableObject {
         }
         
         // Calculate the base delay - faster animation for higher speeds
-        let baseDelay = UInt64(500_000_000 / animationSpeed) // nanoseconds
+        let baseDelay = UInt64(Double(AppConstants.Animation.baseDelay) / animationSpeed) // nanoseconds
         
         // Create a copy of bars sorted by height (shortest to tallest)
         let sortedBars = bars.sorted { $0.value < $1.value }

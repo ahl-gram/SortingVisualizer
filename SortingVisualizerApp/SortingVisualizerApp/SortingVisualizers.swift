@@ -23,7 +23,7 @@ enum SortingVisualizers {
     
     /// Calculate delay based on animation speed
     private static func calculateDelay(animationSpeed: Double) -> UInt64 {
-        let baseDelay: UInt64 = 500_000_000 // 0.5 seconds in nanoseconds
+        let baseDelay: UInt64 = AppConstants.Animation.baseDelay // 0.5 seconds in nanoseconds
         return UInt64(Double(baseDelay) / animationSpeed)
     }
     
