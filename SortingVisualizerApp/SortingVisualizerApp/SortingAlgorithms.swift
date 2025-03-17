@@ -15,6 +15,7 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
     case merge = "Merge Sort"
     case insertion = "Insertion Sort"
     case heap = "Heap Sort"
+    case radix = "Radix Sort"
     
     var id: String { self.rawValue }
     
@@ -30,6 +31,8 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
             return "A simple sort that builds the final sorted array one item at a time, similar to how people sort playing cards in their hands. Average time complexity: O(n²)"
         case .heap:
             return "A comparison-based sort that uses a binary heap data structure. It transforms the array into a heap, then repeatedly extracts the maximum element and rebuilds the heap. Average time complexity: O(n log n)"
+        case .radix:
+            return "A non-comparative sort that sorts data by processing individual digits. It groups numbers by digit values and sorts from least to most significant digit. Average time complexity: O(nk) where k is the number of digits"
         }
     }
 }
@@ -49,6 +52,8 @@ enum SortingAlgorithms {
         case merge(Int, T)
         /// Marking an element as sorted
         case markSorted(Int)
+        /// Bucket operation for non-comparison sorts (like radix)
+        case bucket(Int, Int)
         /// Algorithm completed
         case completed
     }
@@ -520,6 +525,95 @@ enum SortingAlgorithms {
             
             // Recursively heapify the affected sub-tree
             await heapify(array: &array, n: n, i: largest, onStep: onStep)
+        }
+    }
+    
+    // MARK: - Radix Sort
+    
+    /// Pure radix sort algorithm that reports steps through a callback
+    /// - Parameters:
+    ///   - array: Array to sort (needs to be of Integer type)
+    ///   - onStep: Callback that's called for each step in the algorithm
+    /// - Returns: Sorted array
+    static func radixSort<T: BinaryInteger>(
+        array: [T],
+        onStep: StepCallback<T>
+    ) async -> [T] {
+        var arr = array
+        let n = arr.count
+        
+        // Check for empty or single-element array
+        if n <= 1 {
+            _ = await onStep(.completed, arr)
+            return arr
+        }
+        
+        // Find the maximum number to determine the number of digits
+        guard let maxNum = arr.max() else {
+            _ = await onStep(.completed, arr)
+            return arr
+        }
+        
+        // Do counting sort for every digit
+        // Instead of passing digit number, pass the actual power of 10
+        var exp: T = 1
+        while maxNum / exp > 0 {
+            await countingSortByDigit(array: &arr, exp: exp, onStep: onStep)
+            exp *= 10
+        }
+        
+        // Mark all elements as sorted at the end
+        for i in 0..<n {
+            _ = await onStep(.markSorted(i), arr)
+        }
+        
+        // Report completion
+        _ = await onStep(.completed, arr)
+        
+        return arr
+    }
+    
+    /// Counting sort for a specific digit (used by Radix sort)
+    private static func countingSortByDigit<T: BinaryInteger>(
+        array: inout [T],
+        exp: T,
+        onStep: StepCallback<T>
+    ) async {
+        let n = array.count
+        var output = Array(repeating: T.zero, count: n)
+        var count = Array(repeating: 0, count: 10)
+        
+        // Store count of occurrences in count[]
+        for i in 0..<n {
+            let index = Int((array[i] / exp) % 10)
+            count[index] += 1
+            
+            // Report bucket assignment
+            _ = await onStep(.bucket(i, index), array)
+        }
+        
+        // Change count[i] so that count[i] now contains the position of this digit in output[]
+        for i in 1..<10 {
+            count[i] += count[i - 1]
+        }
+        
+        // Build the output array
+        for i in stride(from: n - 1, through: 0, by: -1) {
+            let index = Int((array[i] / exp) % 10)
+            let outputIndex = count[index] - 1
+            output[outputIndex] = array[i]
+            count[index] -= 1
+            
+            // Report element movement
+            _ = await onStep(.merge(outputIndex, array[i]), array)
+        }
+        
+        // Copy the output array back to the input array
+        for i in 0..<n {
+            if array[i] != output[i] {
+                array[i] = output[i]
+                _ = await onStep(.merge(i, output[i]), array)
+            }
         }
     }
 }

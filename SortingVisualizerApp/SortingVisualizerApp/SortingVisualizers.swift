@@ -259,6 +259,37 @@ enum SortingVisualizers {
             
             return true
             
+        case .bucket(let index, let bucketIndex):
+            // For radix sort: highlight the bar and indicate which bucket it's going to
+            let updatedBars = await MainActor.run { () -> [SortingViewModel.SortingBar] in
+                var barsCopy = bars
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    barsCopy[index].state = .comparing
+                    params.updateBars(barsCopy)
+                }
+                
+                if params.isAudioEnabled {
+                    // Play a tone related to the bucket index (0-9)
+                    let bucketTone = 100 + (bucketIndex * 10)
+                    params.audioManager.playTone(forValue: bucketTone)
+                }
+                
+                return barsCopy
+            }
+            
+            // Delay for visualization
+            try? await Task.sleep(nanoseconds: scaledDelay)
+            
+            // Reset the bar state to unsorted
+            let resetBars = await resetBarsToUnsorted(
+                indexes: [index],
+                bars: updatedBars,
+                params: params
+            )
+            bars = resetBars
+            
+            return true
+            
         case .markSorted(let index):
             // Mark the element as sorted
             let updatedBars = await markBarsAsSorted(
@@ -362,6 +393,18 @@ enum SortingVisualizers {
             
         case .heap:
             _ = await SortingAlgorithms.heapSort(array: values) { step, _ in
+                await processSortingStep(
+                    step: step,
+                    bars: &localBars,
+                    params: params,
+                    markAllAsSorted: markAllAsSorted,
+                    onComplete: onComplete,
+                    scaledDelay: scaledDelay
+                )
+            }
+            
+        case .radix:
+            _ = await SortingAlgorithms.radixSort(array: values) { step, _ in
                 await processSortingStep(
                     step: step,
                     bars: &localBars,
