@@ -39,10 +39,10 @@ class AudioManager {
         
         // Calculate frequency based on the bar's height/value
         // Higher values produce higher pitches
-        let baseFrequency: Float = 116.5 // A3 note
-        let maxValue: Float = 200.0 // Maximum possible value
+        let baseFrequency: Float = 116.5 // Bflat 2 note
+        let maxValue: Float = Float(AppConstants.Audio.maxBarValue) // Maximum possible value
         let normalizedValue = Float(value) / maxValue
-        let frequency = baseFrequency + (normalizedValue * 349.66) // Range from A3 to A5
+        let frequency = baseFrequency + (normalizedValue * 349.66) // Range from Bflat 2 to Bflat 4
         
         // Create a short tone
         let sampleRate = Float(outputFormat.sampleRate)

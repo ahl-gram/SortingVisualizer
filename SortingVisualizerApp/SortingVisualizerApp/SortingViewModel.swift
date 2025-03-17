@@ -251,7 +251,7 @@ class SortingViewModel: ObservableObject {
                     
                     // Play a tone for each newly sorted element
                     if isAudioEnabled {
-                        audioManager.playTone(forValue: 200)
+                        audioManager.playTone(forValue: AppConstants.Audio.sortedToneValue)
                     }
                 }
             }

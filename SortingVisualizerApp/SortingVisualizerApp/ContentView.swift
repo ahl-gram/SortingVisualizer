@@ -62,7 +62,7 @@ struct ContentView: View {
                             let maxAvailableHeight = vizGeometry.size.height * 0.95
                             
                             // Find the max value in the array to normalize heights
-                            let maxBarValue = viewModel.bars.map { $0.value }.max() ?? 200
+                            let maxBarValue = viewModel.bars.map { $0.value }.max() ?? AppConstants.Audio.maxBarValue
                             
                             HStack(alignment: .bottom, spacing: barSpacing) {
                                 ForEach(viewModel.bars) { bar in

@@ -105,7 +105,7 @@ enum SortingVisualizers {
             
             // Play a higher tone for sorted element
             if params.isAudioEnabled {
-                params.audioManager.playTone(forValue: 200) // High tone for sorted elements
+                params.audioManager.playTone(forValue: AppConstants.Audio.sortedToneValue) // High tone for sorted elements
             }
             
             return barsCopy
