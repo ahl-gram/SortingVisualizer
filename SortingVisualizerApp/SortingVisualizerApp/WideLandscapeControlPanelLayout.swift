@@ -48,7 +48,7 @@ struct WideLandscapeControlPanelLayout: View {
                                 .padding(.vertical, 6)
                                 .padding(.horizontal, 8)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 8)
+                                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadius)
                                         .stroke(Color.gray.opacity(0.5), lineWidth: 1)
                                 )
                             }
@@ -107,7 +107,7 @@ struct WideLandscapeControlPanelLayout: View {
                                 .frame(maxWidth: .infinity)
                                 .background(Color.blue)
                                 .foregroundColor(.white)
-                                .cornerRadius(8)
+                                .cornerRadius(AppConstants.UI.cornerRadius)
                         }
                         .disabled(isSorting)
                         .accessibilityLabel("Randomize Button")
@@ -120,7 +120,7 @@ struct WideLandscapeControlPanelLayout: View {
                                     .frame(maxWidth: .infinity)
                                     .background(Color.red)
                                     .foregroundColor(.white)
-                                    .cornerRadius(8)
+                                    .cornerRadius(AppConstants.UI.cornerRadius)
                             }
                             .accessibilityLabel("Stop Button")
                         } else {
@@ -130,7 +130,7 @@ struct WideLandscapeControlPanelLayout: View {
                                     .frame(maxWidth: .infinity)
                                     .background(Color.green)
                                     .foregroundColor(.white)
-                                    .cornerRadius(8)
+                                    .cornerRadius(AppConstants.UI.cornerRadius)
                             }
                             .accessibilityLabel("Start Button")
                         }

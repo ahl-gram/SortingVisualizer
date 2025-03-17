@@ -65,7 +65,7 @@ enum AppConstants {
     // MARK: - UI Constants
     enum UI {
         /// Standard corner radius for UI elements
-        static let cornerRadius: CGFloat = 10
+        static let cornerRadius: CGFloat = 8
         
         /// Standard padding for UI elements
         static let standardPadding: CGFloat = 16
