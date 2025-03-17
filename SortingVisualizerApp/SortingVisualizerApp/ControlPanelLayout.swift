@@ -58,13 +58,17 @@ struct ControlPanelLayout: View {
                         .padding(.bottom, 2)
                         
                         // Algorithm Description
-                        Text(selectedAlgorithm.description)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .padding(.bottom, 3)
-                            .accessibilityLabel("Algorithm Description")
-                            .frame(height: 50, alignment: .top)
+                        ScrollView {
+                            Text(selectedAlgorithm.description)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(.bottom, 3)
+                                .accessibilityLabel("Algorithm Description")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .frame(height: 100)
+                        .accessibilityLabel("Scrollable Algorithm Description")
                     }
                     .frame(width: geometry.size.width/2)
                     
