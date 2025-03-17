@@ -21,12 +21,37 @@ struct WideLandscapeControlPanelLayout: View {
                         HStack {
                             Text("Algorithm:")
                             Spacer()
-                            Picker("Select Algorithm", selection: $selectedAlgorithm) {
-                                ForEach(SortingAlgorithmType.allCases) { algorithm in
-                                    Text(algorithm.rawValue).tag(algorithm)
+                            
+                            // Create a custom picker display to show selected algorithm in blue
+                            Menu {
+                                ForEach(SortingAlgorithmType.allCases.sorted(by: { $0.rawValue > $1.rawValue })) { algorithm in
+                                    Button(action: {
+                                        selectedAlgorithm = algorithm
+                                    }) {
+                                        Text(algorithm.rawValue)
+                                        if selectedAlgorithm == algorithm {
+                                            Spacer()
+                                            Image(systemName: "checkmark")
+                                        }
+                                    }
                                 }
+                            } label: {
+                                HStack {
+                                    Text(selectedAlgorithm.rawValue)
+                                        .foregroundColor(.blue)
+                                    Spacer()
+                                    Image(systemName: "chevron.down")
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                }
+                                .frame(width: 180)
+                                .padding(.vertical, 6)
+                                .padding(.horizontal, 8)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.gray.opacity(0.5), lineWidth: 1)
+                                )
                             }
-                            .frame(width: 180)
                             .disabled(isSorting)
                             .accessibilityLabel("Algorithm Selector")
                         }
@@ -119,9 +144,10 @@ struct WideLandscapeControlPanelLayout: View {
                     // Audio Toggle positioned right after the buttons
                     Toggle(isOn: $isAudioEnabled) {
                         Text("Sound Effects")
+                            .padding(.trailing, 15)
                     }
                     .accessibilityLabel("Sound Effects Toggle")
-                    .frame(width: 180)
+                    .frame(width: 200)
                     
                     // Flexible space to push everything to the left
                     Spacer()
