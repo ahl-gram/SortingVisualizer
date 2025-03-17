@@ -14,7 +14,7 @@ struct WideLandscapeControlPanelLayout: View {
         GeometryReader { geometry in
             VStack(spacing: 5) {
                 // Top section with algorithm picker, description and sliders
-                HStack(alignment: .top, spacing: 15) {
+                HStack(alignment: .top, spacing: 10) {
                     // Left column - algorithm picker and description
                     VStack(alignment: .leading, spacing: 6) {
                         // Algorithm Picker - Dropdown style
@@ -41,7 +41,7 @@ struct WideLandscapeControlPanelLayout: View {
                             .accessibilityLabel("Algorithm Description")
                             .frame(height: 50, alignment: .top)
                     }
-                    .frame(maxWidth: .infinity)
+                    .frame(width: geometry.size.width/2)
                     
                     // Right column - sliders
                     VStack(alignment: .leading, spacing: 8) {
@@ -72,7 +72,7 @@ struct WideLandscapeControlPanelLayout: View {
                 }
                 
                 // Bottom row with buttons and sound toggle aligned horizontally
-                HStack {
+                HStack(spacing: 0) {
                     // Buttons on the left
                     HStack(spacing: 10) {
                         // Randomize Button
@@ -110,17 +110,21 @@ struct WideLandscapeControlPanelLayout: View {
                             .accessibilityLabel("Start Button")
                         }
                     }
-                    // Use half of the available width for the buttons
-                    .frame(width: geometry.size.width / 2)
+                    // Set width for buttons
+                    .frame(width: geometry.size.width/2)
                     
-                    Spacer()
+                    // Small fixed space after buttons
+                    Spacer().frame(width: 10)
                     
-                    // Audio Toggle on the right
+                    // Audio Toggle positioned right after the buttons
                     Toggle(isOn: $isAudioEnabled) {
                         Text("Sound Effects")
                     }
                     .accessibilityLabel("Sound Effects Toggle")
                     .frame(width: 180)
+                    
+                    // Flexible space to push everything to the left
+                    Spacer()
                 }
             }
             .padding(.vertical, 8)
