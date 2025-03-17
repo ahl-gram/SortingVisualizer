@@ -66,11 +66,5 @@ enum AppConstants {
     enum UI {
         /// Standard corner radius for UI elements
         static let cornerRadius: CGFloat = 8
-        
-        /// Standard padding for UI elements
-        static let standardPadding: CGFloat = 16
-        
-        /// Button size for control buttons
-        static let buttonSize: CGFloat = 44
     }
 } 

@@ -43,17 +43,17 @@ class SortingViewModel: ObservableObject {
         var newBars: [SortingBar] = []
         
         // Define height parameters
-        let minHeight = 10
+        let minHeight = AppConstants.BarGeneration.minHeight
         
         // Set maximum height based on array size
         let maxHeight: Int
         switch size {
         case 10...30:
-            maxHeight = 500
+            maxHeight = AppConstants.BarGeneration.maxHeightSmall
         case 31...60:
-            maxHeight = 450
+            maxHeight = AppConstants.BarGeneration.maxHeightMedium
         default:
-            maxHeight = 400
+            maxHeight = AppConstants.BarGeneration.maxHeightLarge
         }
         
         // Calculate the range of heights
