@@ -29,7 +29,7 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
         case .quick:
             return "A divide-and-conquer sort that works by selecting a 'pivot' element and partitioning the array around the pivot. Average time complexity: O(n log n)"
         case .merge:
-            return "An efficient, stable, divide-and-conquer sort that divides the array into halves, sorts them separately, and then merges the sorted halves. Average time complexity: O(n log n)"
+            return "A divide-and-conquer sort that divides the array into halves, sorts them separately, and then merges the sorted halves. Average time complexity: O(n log n)"
         case .insertion:
             return "A simple sort that builds the final sorted array one item at a time, similar to how people sort playing cards in their hands. Average time complexity: O(n²)"
         case .heap:
