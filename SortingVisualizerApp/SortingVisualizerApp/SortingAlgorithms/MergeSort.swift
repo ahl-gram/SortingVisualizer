@@ -68,7 +68,7 @@ enum MergeSort {
     }
     
     /// Merge function for merge sort
-    private static func merge<T: Comparable>(
+    static func merge<T: Comparable>(
         array: inout [T],
         start: Int,
         mid: Int,
