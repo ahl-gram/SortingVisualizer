@@ -151,7 +151,7 @@ struct ControlPanelLayout: View {
                             .padding(.trailing, 15)
                     }
                     .accessibilityLabel("Sound Effects Toggle")
-                    .frame(width: 200)
+                    .frame(width: geometry.size.width/2 - 30)
                     
                     // Flexible space to push everything to the left
                     Spacer()
