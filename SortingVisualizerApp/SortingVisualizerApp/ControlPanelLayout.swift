@@ -13,9 +13,8 @@ struct ControlPanelLayout: View {
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 5) {
-                // Top section with algorithm picker, description and sliders
                 HStack(alignment: .top, spacing: 10) {
-                    // Left column - algorithm picker and description
+                    // Left column - algorithm picker, description, and buttons
                     VStack(alignment: .leading, spacing: 6) {
                         // Algorithm Picker - Dropdown style
                         HStack {
@@ -71,11 +70,49 @@ struct ControlPanelLayout: View {
                         }
                         .frame(height: 100)
                         .accessibilityLabel("Scrollable Algorithm Description")
+                        
+                        // Randomize and Start/Stop Buttons
+                        HStack(spacing: 10) {
+                            // Randomize Button
+                            Button(action: onRandomize) {
+                                Text("Randomize")
+                                    .padding(.vertical, 8)
+                                    .frame(maxWidth: .infinity)
+                                    .background(Color.blue)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(AppConstants.UI.cornerRadius)
+                            }
+                            .disabled(isSorting)
+                            .accessibilityLabel("Randomize Button")
+                            
+                            // Start/Stop Sorting Button
+                            if isSorting {
+                                Button(action: onStopSorting) {
+                                    Text("Stop")
+                                        .padding(.vertical, 8)
+                                        .frame(maxWidth: .infinity)
+                                        .background(Color.red)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(AppConstants.UI.cornerRadius)
+                                }
+                                .accessibilityLabel("Stop Button")
+                            } else {
+                                Button(action: onStartSorting) {
+                                    Text("Start")
+                                        .padding(.vertical, 8)
+                                        .frame(maxWidth: .infinity)
+                                        .background(Color.green)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(AppConstants.UI.cornerRadius)
+                                }
+                                .accessibilityLabel("Start Button")
+                            }
+                        }
                     }
-                    .frame(width: geometry.size.width/2)
+                    .frame(maxWidth: .infinity)
                     
-                    // Right column - sliders
-                    VStack(alignment: .leading, spacing: 8) {
+                    // Right column - sliders and audio toggle
+                    VStack(alignment: .leading, spacing: 6) {
                         // Array Size Slider
                         HStack {
                             Text("Array Size:")
@@ -101,65 +138,16 @@ struct ControlPanelLayout: View {
                         
                         Slider(value: $animationSpeed, in: 1...20, step: 1)
                             .accessibilityLabel("Animation Speed Slider")
+                            
+                        // Audio Toggle
+                        Toggle(isOn: $isAudioEnabled) {
+                            Text("Sound Effects")
+                                .padding(.trailing, 15)
                         }
+                        .accessibilityLabel("Sound Effects Toggle")
+                        .padding(.top, 8)
+                    }
                     .frame(maxWidth: .infinity)
-                }
-                
-                // Bottom row with buttons and sound toggle aligned horizontally
-                HStack(spacing: 0) {
-                    // Buttons on the left
-                    HStack(spacing: 10) {
-                        // Randomize Button
-                        Button(action: onRandomize) {
-                            Text("Randomize")
-                                .padding(.vertical, 8)
-                                .frame(maxWidth: .infinity)
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(AppConstants.UI.cornerRadius)
-                        }
-                        .disabled(isSorting)
-                        .accessibilityLabel("Randomize Button")
-                        
-                        // Start/Stop Sorting Button
-                        if isSorting {
-                            Button(action: onStopSorting) {
-                                Text("Stop")
-                                    .padding(.vertical, 8)
-                                    .frame(maxWidth: .infinity)
-                                    .background(Color.red)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(AppConstants.UI.cornerRadius)
-                            }
-                            .accessibilityLabel("Stop Button")
-                        } else {
-                            Button(action: onStartSorting) {
-                                Text("Start")
-                                    .padding(.vertical, 8)
-                                    .frame(maxWidth: .infinity)
-                                    .background(Color.green)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(AppConstants.UI.cornerRadius)
-                            }
-                            .accessibilityLabel("Start Button")
-                        }
-                    }
-                    // Set width for buttons
-                    .frame(width: geometry.size.width/2)
-                    
-                    // Small fixed space after buttons
-                    Spacer().frame(width: 10)
-                    
-                    // Audio Toggle positioned right after the buttons
-                    Toggle(isOn: $isAudioEnabled) {
-                        Text("Sound Effects")
-                            .padding(.trailing, 15)
-                    }
-                    .accessibilityLabel("Sound Effects Toggle")
-                    .frame(width: geometry.size.width/2 - 30)
-                    
-                    // Flexible space to push everything to the left
-                    Spacer()
                 }
             }
             .padding(.vertical, 8)
