@@ -20,6 +20,7 @@ struct ControlPanelLayout: View {
                         // Algorithm Picker - Dropdown style
                         HStack {
                             Text("Algorithm:")
+                                .opacity(isSorting ? 0.5 : 1)
                             Spacer()
                             
                             // Create a custom picker display to show selected algorithm in blue
@@ -53,6 +54,7 @@ struct ControlPanelLayout: View {
                                 )
                             }
                             .disabled(isSorting)
+                            .opacity(isSorting ? 0.5 : 1)
                             .accessibilityLabel("Algorithm Selector")
                         }
                         .padding(.bottom, 2)
@@ -77,14 +79,17 @@ struct ControlPanelLayout: View {
                         // Array Size Slider
                         HStack {
                             Text("Array Size:")
+                                .opacity(isSorting ? 0.5 : 1)
                             Spacer()
                             Text("\(Int(arraySize))")
                                 .frame(width: 40, alignment: .trailing)
+                                .opacity(isSorting ? 0.5 : 1)
                         }
                         
                         Slider(value: $arraySize, in: 10...100, step: 1)
                             .accessibilityLabel("Array Size Slider")
                             .disabled(isSorting)
+                            .opacity(isSorting ? 0.5 : 1)
                         
                         // Animation Speed Slider
                         HStack {
