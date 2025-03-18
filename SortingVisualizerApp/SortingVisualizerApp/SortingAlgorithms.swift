@@ -103,182 +103,19 @@ enum SortingAlgorithms {
     }
     
     // MARK: - Heap Sort
-    
-    /// Pure heap sort algorithm that reports steps through a callback
-    /// - Parameters:
-    ///   - array: Array to sort
-    ///   - onStep: Callback that's called for each step in the algorithm
-    /// - Returns: Sorted array
     static func heapSort<T: Comparable>(
         array: [T],
-        onStep: StepCallback<T>
+        onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
-        var arr = array
-        let n = arr.count
-        
-        // Check for empty or single-element array
-        if n <= 1 {
-            _ = await onStep(.completed, arr)
-            return arr
-        }
-        
-        // Build heap (rearrange array)
-        for i in stride(from: n / 2 - 1, through: 0, by: -1) {
-            await heapify(array: &arr, n: n, i: i, onStep: onStep)
-        }
-        
-        // Extract elements from heap one by one
-        for i in stride(from: n - 1, through: 0, by: -1) {
-            // Move current root to end
-            arr.swapAt(0, i)
-            
-            // Report swap
-            _ = await onStep(.swap(0, i), arr)
-            
-            // Mark element as sorted
-            _ = await onStep(.markSorted(i), arr)
-            
-            // Call max heapify on the reduced heap
-            await heapify(array: &arr, n: i, i: 0, onStep: onStep)
-        }
-        
-        // Report completion
-        _ = await onStep(.completed, arr)
-        
-        return arr
-    }
-    
-    /// Heapify function for heap sort
-    private static func heapify<T: Comparable>(
-        array: inout [T],
-        n: Int,
-        i: Int,
-        onStep: StepCallback<T>
-    ) async {
-        var largest = i     // Initialize largest as root
-        let left = 2 * i + 1    // Left child
-        let right = 2 * i + 2   // Right child
-        
-        // If left child is larger than root
-        if left < n {
-            // Report comparison
-            _ = await onStep(.compare(left, largest), array)
-            
-            if array[left] > array[largest] {
-                largest = left
-            }
-        }
-        
-        // If right child is larger than the current largest
-        if right < n {
-            // Report comparison
-            _ = await onStep(.compare(right, largest), array)
-            
-            if array[right] > array[largest] {
-                largest = right
-            }
-        }
-        
-        // If largest is not root
-        if largest != i {
-            // Swap
-            array.swapAt(i, largest)
-            
-            // Report swap
-            _ = await onStep(.swap(i, largest), array)
-            
-            // Recursively heapify the affected sub-tree
-            await heapify(array: &array, n: n, i: largest, onStep: onStep)
-        }
+        return await HeapSort.heapSort(array: array, onStep: onStep)
     }
     
     // MARK: - Radix Sort
-    
-    /// Pure radix sort algorithm that reports steps through a callback
-    /// - Parameters:
-    ///   - array: Array to sort (needs to be of Integer type)
-    ///   - onStep: Callback that's called for each step in the algorithm
-    /// - Returns: Sorted array
     static func radixSort<T: BinaryInteger>(
         array: [T],
-        onStep: StepCallback<T>
+        onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
-        var arr = array
-        let n = arr.count
-        
-        // Check for empty or single-element array
-        if n <= 1 {
-            _ = await onStep(.completed, arr)
-            return arr
-        }
-        
-        // Find the maximum number to determine the number of digits
-        guard let maxNum = arr.max() else {
-            _ = await onStep(.completed, arr)
-            return arr
-        }
-        
-        // Do counting sort for every digit
-        // Instead of passing digit number, pass the actual power of 10
-        var exp: T = 1
-        while maxNum / exp > 0 {
-            await countingSortByDigit(array: &arr, exp: exp, onStep: onStep)
-            exp *= 10
-        }
-        
-        // Mark all elements as sorted at the end
-        for i in 0..<n {
-            _ = await onStep(.markSorted(i), arr)
-        }
-        
-        // Report completion
-        _ = await onStep(.completed, arr)
-        
-        return arr
-    }
-    
-    /// Counting sort for a specific digit (used by Radix sort)
-    private static func countingSortByDigit<T: BinaryInteger>(
-        array: inout [T],
-        exp: T,
-        onStep: StepCallback<T>
-    ) async {
-        let n = array.count
-        var output = Array(repeating: T.zero, count: n)
-        var count = Array(repeating: 0, count: 10)
-        
-        // Store count of occurrences in count[]
-        for i in 0..<n {
-            let index = Int((array[i] / exp) % 10)
-            count[index] += 1
-            
-            // Report bucket assignment
-            _ = await onStep(.bucket(i, index), array)
-        }
-        
-        // Change count[i] so that count[i] now contains the position of this digit in output[]
-        for i in 1..<10 {
-            count[i] += count[i - 1]
-        }
-        
-        // Build the output array
-        for i in stride(from: n - 1, through: 0, by: -1) {
-            let index = Int((array[i] / exp) % 10)
-            let outputIndex = count[index] - 1
-            output[outputIndex] = array[i]
-            count[index] -= 1
-            
-            // Report element movement
-            _ = await onStep(.merge(outputIndex, array[i]), array)
-        }
-        
-        // Copy the output array back to the input array
-        for i in 0..<n {
-            if array[i] != output[i] {
-                array[i] = output[i]
-                _ = await onStep(.merge(i, output[i]), array)
-            }
-        }
+        return await RadixSort.radixSort(array: array, onStep: onStep)
     }
     
     // MARK: - Time Sort
