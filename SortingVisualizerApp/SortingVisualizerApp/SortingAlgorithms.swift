@@ -18,6 +18,7 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
     case radix = "Radix Sort"
     case time = "Time Sort"
     case bucket = "Bucket Sort"
+    case selection = "Selection Sort"
     
     var id: String { self.rawValue }
     
@@ -39,6 +40,8 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
             return "A hybrid sort that combines insertion sort for small subarrays with merge sort for larger arrays. It adapts based on the input size for optimal performance. Average time complexity: O(n log n)"
         case .bucket:
             return "A distribution sort that distributes elements into a number of buckets, sorts each bucket individually, and then concatenates the buckets. Performs best with uniform distributions. Average time complexity: O(n+k), where k is the number of buckets"
+        case .selection:
+            return "A simple in-place comparison sort that divides the input into a sorted and an unsorted region. It repeatedly finds the minimum element from the unsorted region and puts it at the end of the sorted region. Average time complexity: O(n²)"
         }
     }
 }
@@ -857,6 +860,65 @@ enum SortingAlgorithms {
             
             arr[j + 1] = key
         }
+        
+        return arr
+    }
+    
+    // MARK: - Selection Sort
+    
+    /// Pure selection sort algorithm that reports steps through a callback
+    /// - Parameters:
+    ///   - array: Array to sort
+    ///   - onStep: Callback that's called for each step in the algorithm
+    /// - Returns: Sorted array
+    static func selectionSort<T: Comparable>(
+        array: [T],
+        onStep: StepCallback<T>
+    ) async -> [T] {
+        var arr = array
+        let n = arr.count
+        
+        // Check for empty or single-element array
+        if n <= 1 {
+            _ = await onStep(.completed, arr)
+            return arr
+        }
+        
+        // One by one move boundary of unsorted subarray
+        for i in 0..<n-1 {
+            // Find the minimum element in unsorted array
+            var minIndex = i
+            
+            for j in i+1..<n {
+                // Report comparison
+                let shouldContinue = await onStep(.compare(j, minIndex), arr)
+                if !shouldContinue { return arr } // Allow cancellation
+                
+                // If current element is smaller than the minimum found so far
+                if arr[j] < arr[minIndex] {
+                    minIndex = j
+                }
+            }
+            
+            // Swap the found minimum element with the first element
+            if minIndex != i {
+                arr.swapAt(minIndex, i)
+                
+                // Report swap
+                let shouldContinue = await onStep(.swap(minIndex, i), arr)
+                if !shouldContinue { return arr } // Allow cancellation
+            }
+            
+            // Mark the element as sorted (now in its final position)
+            let shouldContinue = await onStep(.markSorted(i), arr)
+            if !shouldContinue { return arr } // Allow cancellation
+        }
+        
+        // Mark the last element as sorted
+        _ = await onStep(.markSorted(n-1), arr)
+        
+        // Report completion
+        _ = await onStep(.completed, arr)
         
         return arr
     }
