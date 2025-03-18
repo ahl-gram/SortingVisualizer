@@ -11,7 +11,7 @@ enum TimeSort {
         array: [T],
         onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
-        var arr = array
+        let arr = array
         let n = arr.count
         
         // Check for empty or single-element array

@@ -45,7 +45,6 @@ class AudioManager {
         let frequency = baseFrequency + (normalizedValue * 349.66) // Range from Bflat 2 to Bflat 4
         
         // Create a short tone
-        let sampleRate = Float(outputFormat.sampleRate)
         let duration: Float = 0.1 // 100ms tone
         
         let buffer = createToneBuffer(frequency: frequency, duration: duration)

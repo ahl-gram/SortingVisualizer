@@ -72,8 +72,8 @@ enum MergeSort {
         let leftSize = mid - start + 1
         let rightSize = end - mid
         
-        var leftArray = Array(array[start...(start + leftSize - 1)])
-        var rightArray = Array(array[(mid + 1)...end])
+        let leftArray = Array(array[start...(start + leftSize - 1)])
+        let rightArray = Array(array[(mid + 1)...end])
         
         // Indexes for traversing the temporary arrays
         var i = 0, j = 0

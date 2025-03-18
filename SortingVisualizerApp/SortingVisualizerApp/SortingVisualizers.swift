@@ -186,7 +186,7 @@ enum SortingVisualizers {
                 // This is a direct update, not a swap
                 // Simply update the UI without swap animation
                 let updatedBars = await MainActor.run { () -> [SortingViewModel.SortingBar] in
-                    var barsCopy = bars
+                    let barsCopy = bars
                     // Use a simpler animation for direct updates
                     withAnimation(.easeInOut(duration: 0.2)) {
                         params.updateBars(barsCopy)
