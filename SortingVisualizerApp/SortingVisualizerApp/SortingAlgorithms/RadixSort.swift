@@ -1,10 +1,3 @@
-//
-//  SortingAlgorithms.swift
-//  SortingVisualizerApp
-//
-//  Created for Sorting Visualizer App
-//
-
 import Foundation
 import SwiftUI
 
@@ -14,8 +7,7 @@ import SwiftUI
 ///   - onStep: Callback that's called for each step in the algorithm
 /// - Returns: Sorted array
 enum RadixSort {
-
-    static func radixSort<T: BinaryInteger>(
+    static func sort<T: BinaryInteger>(
         array: [T],
         onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {

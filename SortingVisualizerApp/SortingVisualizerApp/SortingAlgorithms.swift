@@ -46,7 +46,6 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
     }
 }
 
-/// Pure sorting algorithms without visualization or audio logic
 enum SortingAlgorithms {
     
     // MARK: - Bubble Sort
@@ -54,7 +53,7 @@ enum SortingAlgorithms {
         array: [T],
         onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
-        return await BubbleSort.bubbleSort(array: array, onStep: onStep)
+        return await BubbleSort.sort(array: array, onStep: onStep)
     }
     
     // MARK: - Quick Sort
@@ -62,7 +61,7 @@ enum SortingAlgorithms {
         array: [T],
         onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
-        return await QuickSort.quickSort(array: array, onStep: onStep)
+        return await QuickSort.sort(array: array, onStep: onStep)
     }
     
     // MARK: - Merge Sort
@@ -70,7 +69,7 @@ enum SortingAlgorithms {
         array: [T],
         onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
-        return await MergeSort.mergeSort(array: array, onStep: onStep)
+        return await MergeSort.sort(array: array, onStep: onStep)
     }
     
     // MARK: - Insertion Sort
@@ -78,7 +77,7 @@ enum SortingAlgorithms {
         array: [T],
         onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
-        return await InsertionSort.insertionSort(array: array, onStep: onStep)
+        return await InsertionSort.sort(array: array, onStep: onStep)
     }
     
     // MARK: - Heap Sort
@@ -86,7 +85,7 @@ enum SortingAlgorithms {
         array: [T],
         onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
-        return await HeapSort.heapSort(array: array, onStep: onStep)
+        return await HeapSort.sort(array: array, onStep: onStep)
     }
     
     // MARK: - Radix Sort
@@ -94,7 +93,7 @@ enum SortingAlgorithms {
         array: [T],
         onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
-        return await RadixSort.radixSort(array: array, onStep: onStep)
+        return await RadixSort.sort(array: array, onStep: onStep)
     }
     
     // MARK: - Time Sort
@@ -102,7 +101,7 @@ enum SortingAlgorithms {
         array: [T],
         onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
-        return await TimeSort.timeSort(array: array, onStep: onStep)
+        return await TimeSort.sort(array: array, onStep: onStep)
     }
     
     // MARK: - Bucket Sort
@@ -110,7 +109,7 @@ enum SortingAlgorithms {
         array: [T],
         onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
-        return await BucketSort.bucketSort(array: array, onStep: onStep)
+        return await BucketSort.sort(array: array, onStep: onStep)
     }
     
     // MARK: - Selection Sort
@@ -118,6 +117,6 @@ enum SortingAlgorithms {
         array: [T],
         onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
-        return await SelectionSort.selectionSort(array: array, onStep: onStep)
+        return await SelectionSort.sort(array: array, onStep: onStep)
     }
 }

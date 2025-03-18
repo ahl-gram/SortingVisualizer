@@ -1,10 +1,3 @@
-    //
-//  SortingAlgorithms.swift
-//  SortingVisualizerApp
-//
-//  Created for Sorting Visualizer App
-//
-
 import Foundation
 import SwiftUI
 
@@ -14,9 +7,9 @@ import SwiftUI
 ///   - onStep: Callback that's called for each step in the algorithm
 /// - Returns: Sorted array
 enum InsertionSort {
-        static func insertionSort<T: Comparable>(
-            array: [T],
-            onStep: SortingStepType.StepCallback<T>
+    static func sort<T: Comparable>(
+        array: [T],
+        onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
         var arr = array
         let n = arr.count

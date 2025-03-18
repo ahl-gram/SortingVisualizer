@@ -1,20 +1,13 @@
-//
-//  SortingAlgorithms.swift
-//  SortingVisualizerApp
-//
-//  Created for Sorting Visualizer App
-//
-
 import Foundation
 import SwiftUI
+
 /// Time Sort implementation - a hybrid algorithm combining insertion sort for small arrays and merge sort for larger ones
 /// - Parameters:
 ///   - array: Array to sort
 ///   - onStep: Callback that's called for each step in the algorithm
 /// - Returns: Sorted array
 enum TimeSort {
-
-    static func timeSort<T: Comparable>(
+    static func sort<T: Comparable>(
         array: [T],
         onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
@@ -29,7 +22,7 @@ enum TimeSort {
         
         // Use insertion sort for small arrays (less than 16 elements)
         if n < 16 {
-            return await InsertionSort.insertionSort(array: arr, onStep: onStep)
+            return await InsertionSort.sort(array: arr, onStep: onStep)
         }
         
         // For larger arrays, use merge sort with insertion sort for small subarrays

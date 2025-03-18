@@ -1,19 +1,13 @@
-//
-//  SortingAlgorithms.swift
-//  SortingVisualizerApp
-//
-//  Created for Sorting Visualizer App
-//
-
 import Foundation
 import SwiftUI
+
 /// Pure heap sort algorithm that reports steps through a callback
 /// - Parameters:
 ///   - array: Array to sort
 ///   - onStep: Callback that's called for each step in the algorithm
 /// - Returns: Sorted array
 enum HeapSort {
-    static func heapSort<T: Comparable>(
+    static func sort<T: Comparable>(
         array: [T],
         onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
