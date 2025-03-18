@@ -426,6 +426,18 @@ enum SortingVisualizers {
                     scaledDelay: scaledDelay
                 )
             }
+            
+        case .bucket:
+            _ = await SortingAlgorithms.bucketSort(array: values) { step, _ in
+                await processSortingStep(
+                    step: step,
+                    bars: &localBars,
+                    params: params,
+                    markAllAsSorted: markAllAsSorted,
+                    onComplete: onComplete,
+                    scaledDelay: scaledDelay
+                )
+            }
         }
     }
 } 

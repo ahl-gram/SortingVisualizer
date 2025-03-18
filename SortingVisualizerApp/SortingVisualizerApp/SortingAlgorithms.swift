@@ -17,6 +17,7 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
     case heap = "Heap Sort"
     case radix = "Radix Sort"
     case time = "Time Sort"
+    case bucket = "Bucket Sort"
     
     var id: String { self.rawValue }
     
@@ -36,6 +37,8 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
             return "A non-comparative sort that sorts data by processing individual digits. It groups numbers by digit values and sorts from least to most significant digit. Average time complexity: O(nk) where k is the number of digits"
         case .time:
             return "A hybrid sort that combines insertion sort for small subarrays with merge sort for larger arrays. It adapts based on the input size for optimal performance. Average time complexity: O(n log n)"
+        case .bucket:
+            return "A distribution sort that distributes elements into a number of buckets, sorts each bucket individually, and then concatenates the buckets. Performs best with uniform distributions. Average time complexity: O(n+k), where k is the number of buckets"
         }
     }
 }
@@ -750,6 +753,109 @@ enum SortingAlgorithms {
             arr[j + 1] = key
             let shouldContinue = await onStep(.markSorted(i), arr)
             if !shouldContinue { return arr }
+        }
+        
+        return arr
+    }
+    
+    // MARK: - Bucket Sort
+    
+    /// Pure bucket sort algorithm that reports steps through a callback
+    /// - Parameters:
+    ///   - array: Array to sort (values should be in range 0...100)
+    ///   - onStep: Callback that's called for each step in the algorithm
+    /// - Returns: Sorted array
+    static func bucketSort<T: BinaryInteger>(
+        array: [T],
+        onStep: StepCallback<T>
+    ) async -> [T] {
+        var arr = array
+        let n = arr.count
+        
+        // Check for empty or single-element array
+        if n <= 1 {
+            _ = await onStep(.completed, arr)
+            return arr
+        }
+        
+        // Find min and max to determine bucket ranges
+        guard let minValue = arr.min(), let maxValue = arr.max() else {
+            _ = await onStep(.completed, arr)
+            return arr
+        }
+        
+        // Determine the number of buckets (use approximate square root of array size)
+        let bucketCount = max(10, Int(sqrt(Double(n))))
+        
+        // Calculate the range of each bucket
+        let range = max(1, Int((maxValue - minValue) / T(bucketCount) + 1))
+        
+        // Create buckets
+        var buckets = Array(repeating: [T](), count: bucketCount)
+        
+        // Distribute elements into buckets
+        for i in 0..<n {
+            let value = arr[i]
+            let bucketIndex = min(bucketCount - 1, Int((value - minValue) / T(range)))
+            
+            // Report bucket assignment
+            _ = await onStep(.bucket(i, bucketIndex), arr)
+            
+            buckets[bucketIndex].append(value)
+        }
+        
+        // Sort each bucket (using insertion sort for efficiency with small arrays)
+        for b in 0..<bucketCount {
+            buckets[b] = await insertionSortForBucket(array: buckets[b], bucketIndex: b, onStep: onStep)
+        }
+        
+        // Combine the buckets back into the original array
+        var index = 0
+        for b in 0..<bucketCount {
+            for value in buckets[b] {
+                arr[index] = value
+                
+                // Report merge operation
+                _ = await onStep(.merge(index, value), arr)
+                
+                // Mark as sorted
+                _ = await onStep(.markSorted(index), arr)
+                
+                index += 1
+            }
+        }
+        
+        // Report completion
+        _ = await onStep(.completed, arr)
+        
+        return arr
+    }
+    
+    /// Helper function to sort buckets using insertion sort
+    private static func insertionSortForBucket<T: Comparable>(
+        array: [T],
+        bucketIndex: Int,
+        onStep: StepCallback<T>
+    ) async -> [T] {
+        var arr = array
+        let n = arr.count
+        
+        if n <= 1 {
+            return arr
+        }
+        
+        for i in 1..<n {
+            let key = arr[i]
+            var j = i - 1
+            
+            while j >= 0 && arr[j] > key {
+                // We don't report the individual steps for bucket sorting
+                // as it would be too granular and confusing in the visualization
+                arr[j + 1] = arr[j]
+                j -= 1
+            }
+            
+            arr[j + 1] = key
         }
         
         return arr
