@@ -142,7 +142,7 @@ enum SortingVisualizers {
     
     /// Process a sorting step and apply visualization
     private static func processSortingStep(
-        step: SortingAlgorithms.SortingStep<Int>,
+        step: SortingStep<Int>,
         bars: inout [SortingViewModel.SortingBar],
         params: SortingParams,
         markAllAsSorted: @escaping () -> Void,

@@ -71,59 +71,11 @@ enum SortingAlgorithms {
     typealias StepCallback<T> = (SortingStep<T>, [T]) async -> Bool
     
     // MARK: - Bubble Sort
-    
-    /// Pure bubble sort algorithm that reports steps through a callback
-    /// - Parameters:
-    ///   - array: Array to sort
-    ///   - onStep: Callback that's called for each step in the algorithm
-    /// - Returns: Sorted array
     static func bubbleSort<T: Comparable>(
         array: [T],
-        onStep: StepCallback<T>
+        onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
-        var arr = array
-        let n = arr.count
-        
-        // Check for empty or single-element array
-        if n <= 1 {
-            _ = await onStep(.completed, arr)
-            return arr
-        }
-        
-        var swapped = false
-        
-        for i in 0..<n {
-            swapped = false
-            
-            for j in 0..<n - i - 1 {
-                // Report comparison step
-                let shouldContinue = await onStep(.compare(j, j + 1), arr)
-                if !shouldContinue { return arr } // Allow cancellation
-                
-                if arr[j] > arr[j + 1] {
-                    // Swap elements
-                    arr.swapAt(j, j + 1)
-                    swapped = true
-                    
-                    // Report swap step
-                    let shouldContinue = await onStep(.swap(j, j + 1), arr)
-                    if !shouldContinue { return arr } // Allow cancellation
-                }
-            }
-            
-            // Mark element as sorted
-            let shouldContinue = await onStep(.markSorted(n - i - 1), arr)
-            if !shouldContinue { return arr } // Allow cancellation
-            
-            if !swapped {
-                break // Array is sorted
-            }
-        }
-        
-        // Report completion
-        _ = await onStep(.completed, arr)
-        
-        return arr
+        return await BubbleSort.bubbleSort(array: array, onStep: onStep)
     }
     
     // MARK: - Quick Sort
@@ -135,117 +87,9 @@ enum SortingAlgorithms {
     /// - Returns: Sorted array
     static func quickSort<T: Comparable>(
         array: [T],
-        onStep: StepCallback<T>
+        onStep: SortingStepType.StepCallback<T>
     ) async -> [T] {
-        var arr = array
-        
-        // Check for empty or single-element array
-        if arr.count <= 1 {
-            _ = await onStep(.completed, arr)
-            return arr
-        }
-        
-        // Start recursive quicksort
-        await quickSortHelper(
-            array: &arr,
-            low: 0,
-            high: arr.count - 1,
-            onStep: onStep
-        )
-        
-        // Report completion
-        _ = await onStep(.completed, arr)
-        
-        return arr
-    }
-    
-    /// Helper function for quicksort
-    private static func quickSortHelper<T: Comparable>(
-        array: inout [T],
-        low: Int,
-        high: Int,
-        onStep: StepCallback<T>
-    ) async {
-        if low >= high {
-            // Base case: segment is already sorted
-            _ = await onStep(.markSorted(low), array)
-            return
-        }
-        
-        // Partition and get pivot index
-        let pivotIndex = await partition(
-            array: &array,
-            low: low,
-            high: high,
-            onStep: onStep
-        )
-        
-        // Mark pivot as sorted
-        _ = await onStep(.markSorted(pivotIndex), array)
-        
-        // Sort subarrays
-        if pivotIndex > low {
-            await quickSortHelper(
-                array: &array,
-                low: low,
-                high: pivotIndex - 1,
-                onStep: onStep
-            )
-        }
-        
-        if pivotIndex < high {
-            await quickSortHelper(
-                array: &array,
-                low: pivotIndex + 1,
-                high: high,
-                onStep: onStep
-            )
-        }
-    }
-    
-    /// Partition function for quicksort
-    private static func partition<T: Comparable>(
-        array: inout [T],
-        low: Int,
-        high: Int,
-        onStep: StepCallback<T>
-    ) async -> Int {
-        // Use rightmost element as pivot
-        let pivot = array[high]
-        
-        // Report pivot selection
-        _ = await onStep(.compare(high, high), array)
-        
-        // Index of smaller element
-        var i = low - 1
-        
-        // Compare each element with pivot
-        for j in low..<high {
-            // Report comparison
-            let shouldContinue = await onStep(.compare(j, high), array)
-            if !shouldContinue { return i + 1 } // Allow cancellation
-            
-            // If current element <= pivot
-            if array[j] < pivot {
-                // Increment index of smaller element
-                i += 1
-                
-                // Swap elements
-                array.swapAt(i, j)
-                
-                // Report swap
-                _ = await onStep(.swap(i, j), array)
-            }
-        }
-        
-        // Swap pivot to its correct position
-        i += 1
-        array.swapAt(i, high)
-        
-        // Report final swap
-        _ = await onStep(.swap(i, high), array)
-        
-        return i
+        return await QuickSort.quickSort(array: array, onStep: onStep)
     }
     
     // MARK: - Merge Sort
