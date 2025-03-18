@@ -414,6 +414,18 @@ enum SortingVisualizers {
                     scaledDelay: scaledDelay
                 )
             }
+            
+        case .time:
+            _ = await SortingAlgorithms.timeSort(array: values) { step, _ in
+                await processSortingStep(
+                    step: step,
+                    bars: &localBars,
+                    params: params,
+                    markAllAsSorted: markAllAsSorted,
+                    onComplete: onComplete,
+                    scaledDelay: scaledDelay
+                )
+            }
         }
     }
 } 
