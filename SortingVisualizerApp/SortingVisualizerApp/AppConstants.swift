@@ -6,7 +6,7 @@ import SwiftUI
 enum AppConstants {
     // MARK: - Animation Constants
     enum Animation {
-        /// Base delay for visualization (nanoseconds)
+        /// Base delay for visualization (nanoseconds) - .5 second
         static let baseDelay: UInt64 = 500_000_000
         
         /// Duration for standard transitions
@@ -21,10 +21,10 @@ enum AppConstants {
         /// Duration for marking bars as sorted
         static let sortedMarkDuration: Double = 0.5
         
-        /// Minimum animation speed
+        /// Minimum animation speed - .5 second
         static let minAnimationSpeed: Double = 1.0
         
-        /// Maximum animation speed
+        /// Maximum animation speed - .025 second => 25 milliseconds
         static let maxAnimationSpeed: Double = 20.0
     }
     
