@@ -118,7 +118,7 @@ struct ContentView: View {
                     // Initialize with a random array
                     viewModel.randomizeArray(size: Int(arraySize), isUniformDistribution: isUniformDistribution)
                 }
-                .onChange(of: arraySize) { newSize in
+                .onChange(of: arraySize) { oldSize, newSize in
                     // Don't update during sorting
                     guard !viewModel.isSorting else { return }
                     
@@ -130,13 +130,13 @@ struct ContentView: View {
                         viewModel.randomizeArray(size: Int(newSize), isUniformDistribution: isUniformDistribution)
                     }
                 }
-                .onChange(of: animationSpeed) { newSpeed in
+                .onChange(of: animationSpeed) { oldSpeed, newSpeed in
                     // Update animation speed in real-time if sorting is in progress
                     if viewModel.isSorting {
                         viewModel.updateAnimationSpeed(newSpeed)
                     }
                 }
-                .onChange(of: isUniformDistribution) { newValue in
+                .onChange(of: isUniformDistribution) { oldValue, newValue in
                     // Don't update during sorting
                     guard !viewModel.isSorting else { return }
                     
@@ -149,12 +149,10 @@ struct ContentView: View {
     }
 }
 
-#Preview {
+#Preview(traits: .landscapeLeft) {
     ContentView()
-        .previewInterfaceOrientation(.landscapeLeft)
 }
 
-#Preview("Landscape") {
+#Preview("Landscape", traits: .landscapeLeft) {
     ContentView()
-        .previewInterfaceOrientation(.landscapeLeft)
 }

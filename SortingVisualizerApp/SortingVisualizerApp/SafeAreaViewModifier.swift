@@ -45,7 +45,7 @@ struct SafeAreaInsetsReader: View {
                 .onAppear {
                     insets = geometry.safeAreaInsets
                 }
-                .onChange(of: geometry.safeAreaInsets) { newInsets in
+                .onChange(of: geometry.safeAreaInsets) { oldInsets, newInsets in
                     insets = newInsets
                 }
         }
