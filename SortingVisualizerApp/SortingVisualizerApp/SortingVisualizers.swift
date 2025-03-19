@@ -313,6 +313,30 @@ enum SortingVisualizers {
     
     // MARK: - Generic Sorting Method
     
+    /// Maps algorithm type to the corresponding sorting function
+    private static func getSortingFunction(for type: SortingAlgorithmType) -> ([Int], @escaping SortingStepType.StepCallback<Int>) async -> [Int] {
+        switch type {
+        case .bubble:
+            return SortingAlgorithms.bubbleSort
+        case .quick:
+            return SortingAlgorithms.quickSort
+        case .merge:
+            return SortingAlgorithms.mergeSort
+        case .insertion:
+            return SortingAlgorithms.insertionSort
+        case .heap:
+            return SortingAlgorithms.heapSort
+        case .radix:
+            return SortingAlgorithms.radixSort
+        case .time:
+            return SortingAlgorithms.timeSort
+        case .bucket:
+            return SortingAlgorithms.bucketSort
+        case .selection:
+            return SortingAlgorithms.selectionSort
+        }
+    }
+    
     /// Generic method to run any sorting algorithm
     static func runSortingAlgorithm(
         type: SortingAlgorithmType,
@@ -338,115 +362,19 @@ enum SortingVisualizers {
         // Extract bar values for sorting
         let values = localBars.map { $0.value }
         
-        // Run the appropriate sorting algorithm based on the type
-        switch type {
-        case .bubble:
-            _ = await SortingAlgorithms.bubbleSort(array: values) { step, _ in
-                await processSortingStep(
-                    step: step,
-                    bars: &localBars,
-                    params: params,
-                    markAllAsSorted: markAllAsSorted,
-                    onComplete: onComplete,
-                    scaledDelay: scaledDelay
-                )
-            }
-            
-        case .quick:
-            _ = await SortingAlgorithms.quickSort(array: values) { step, _ in
-                await processSortingStep(
-                    step: step,
-                    bars: &localBars,
-                    params: params,
-                    markAllAsSorted: markAllAsSorted,
-                    onComplete: onComplete,
-                    scaledDelay: scaledDelay
-                )
-            }
-            
-        case .merge:
-            _ = await SortingAlgorithms.mergeSort(array: values) { step, _ in
-                await processSortingStep(
-                    step: step,
-                    bars: &localBars,
-                    params: params,
-                    markAllAsSorted: markAllAsSorted,
-                    onComplete: onComplete,
-                    scaledDelay: scaledDelay
-                )
-            }
-            
-        case .insertion:
-            _ = await SortingAlgorithms.insertionSort(array: values) { step, _ in
-                await processSortingStep(
-                    step: step,
-                    bars: &localBars,
-                    params: params,
-                    markAllAsSorted: markAllAsSorted,
-                    onComplete: onComplete,
-                    scaledDelay: scaledDelay
-                )
-            }
-            
-        case .heap:
-            _ = await SortingAlgorithms.heapSort(array: values) { step, _ in
-                await processSortingStep(
-                    step: step,
-                    bars: &localBars,
-                    params: params,
-                    markAllAsSorted: markAllAsSorted,
-                    onComplete: onComplete,
-                    scaledDelay: scaledDelay
-                )
-            }
-            
-        case .radix:
-            _ = await SortingAlgorithms.radixSort(array: values) { step, _ in
-                await processSortingStep(
-                    step: step,
-                    bars: &localBars,
-                    params: params,
-                    markAllAsSorted: markAllAsSorted,
-                    onComplete: onComplete,
-                    scaledDelay: scaledDelay
-                )
-            }
-            
-        case .time:
-            _ = await SortingAlgorithms.timeSort(array: values) { step, _ in
-                await processSortingStep(
-                    step: step,
-                    bars: &localBars,
-                    params: params,
-                    markAllAsSorted: markAllAsSorted,
-                    onComplete: onComplete,
-                    scaledDelay: scaledDelay
-                )
-            }
-            
-        case .bucket:
-            _ = await SortingAlgorithms.bucketSort(array: values) { step, _ in
-                await processSortingStep(
-                    step: step,
-                    bars: &localBars,
-                    params: params,
-                    markAllAsSorted: markAllAsSorted,
-                    onComplete: onComplete,
-                    scaledDelay: scaledDelay
-                )
-            }
-            
-        case .selection:
-            _ = await SortingAlgorithms.selectionSort(array: values) { step, _ in
-                await processSortingStep(
-                    step: step,
-                    bars: &localBars,
-                    params: params,
-                    markAllAsSorted: markAllAsSorted,
-                    onComplete: onComplete,
-                    scaledDelay: scaledDelay
-                )
-            }
+        // Get the appropriate sorting algorithm function
+        let sortFunction = getSortingFunction(for: type)
+        
+        // Execute the sorting algorithm with a common step processing callback
+        _ = await sortFunction(values) { step, _ in
+            await processSortingStep(
+                step: step,
+                bars: &localBars,
+                params: params,
+                markAllAsSorted: markAllAsSorted,
+                onComplete: onComplete,
+                scaledDelay: scaledDelay
+            )
         }
     }
 } 
