@@ -143,6 +143,13 @@ struct ContentView: View {
                     // Regenerate array with new distribution type
                     viewModel.randomizeArray(size: Int(arraySize), isUniformDistribution: newValue)
                 }
+                .onChange(of: viewModel.selectedAlgorithm) { oldAlgorithm, newAlgorithm in
+                    // Don't update during sorting
+                    guard !viewModel.isSorting else { return }
+                    
+                    // Regenerate array when switching algorithms
+                    viewModel.randomizeArray(size: Int(arraySize), isUniformDistribution: isUniformDistribution)
+                }
             }
         }
         .respectSafeAreas() // Use our custom modifier instead of ignoring safe areas
