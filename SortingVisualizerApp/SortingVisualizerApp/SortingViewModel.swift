@@ -44,17 +44,7 @@ class SortingViewModel: ObservableObject {
         
         // Define height parameters
         let minHeight = AppConstants.BarGeneration.minHeight
-        
-        // Set maximum height based on array size
-        let maxHeight: Int
-        switch size {
-        case 10...30:
-            maxHeight = AppConstants.BarGeneration.maxHeightSmall
-        case 31...60:
-            maxHeight = AppConstants.BarGeneration.maxHeightMedium
-        default:
-            maxHeight = AppConstants.BarGeneration.maxHeightLarge
-        }
+        let maxHeight = AppConstants.BarGeneration.maxHeight
         
         // Calculate the range of heights
         let heightRange = maxHeight - minHeight
@@ -62,28 +52,14 @@ class SortingViewModel: ObservableObject {
         // Generate heights based on the distribution type
         var heights: [Int] = []
         
+        // Uniform distribution - evenly spaced heights
         if isUniformDistribution {
-            // Uniform distribution - evenly spaced heights
-            if size <= heightRange {
-                // Calculate step size to evenly distribute heights
-                let step = heightRange / (size - 1)
-                
-                // Generate heights with uniform distribution
-                for i in 0..<size {
-                    heights.append(minHeight + (i * step))
-                }
-            } else {
-                // When we have more bars than the height range, we need to ensure uniqueness
-                // by generating all possible heights and then sampling from them
+            // Calculate step size to evenly distribute heights
+            let step = heightRange / (size - 1)
             
-                // Generate all possible heights in the range
-                var allPossibleHeights = Array(minHeight...maxHeight)
-                
-                // Shuffle the heights to randomize selection
-                allPossibleHeights.shuffle()
-                    
-                // Select 'size' number of unique heights
-                heights = Array(allPossibleHeights.prefix(size))
+            // Generate heights with uniform distribution
+            for i in 0..<size {
+                heights.append(minHeight + (i * step))
             }
             
             // Shuffle the heights for final randomization

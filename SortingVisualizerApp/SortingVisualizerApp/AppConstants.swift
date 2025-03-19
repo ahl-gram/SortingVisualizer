@@ -52,14 +52,8 @@ enum AppConstants {
         /// Minimum height for bars
         static let minHeight: Int = 10
         
-        /// Maximum height for small arrays (10-30 elements)
-        static let maxHeightSmall: Int = 500
-        
-        /// Maximum height for medium arrays (31-60 elements)
-        static let maxHeightMedium: Int = 450
-        
-        /// Maximum height for large arrays (61+ elements)
-        static let maxHeightLarge: Int = 400
+        /// Maximum height
+        static let maxHeight: Int = 500
     }
     
     // MARK: - UI Constants
