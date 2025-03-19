@@ -5,6 +5,8 @@ enum SortingStep<T> {
     case merge(Int, T)
     case markSorted(Int)
     case bucket(Int, Int)
+    case highlight(Int)     // Highlight an element (for cube visualization)
+    case unhighlight(Int)   // Remove highlight from an element
     case completed
 }
 

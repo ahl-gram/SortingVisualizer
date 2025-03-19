@@ -20,7 +20,8 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
     case bucket = "Bucket Sort"
     case selection = "Selection Sort"
     case shell = "Shell Sort"
-    
+    case cube = "Cube Sort"
+
     var id: String { self.rawValue }
     
     var description: String {
@@ -45,10 +46,12 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
             return "A simple in-place comparison sort that divides the input into a sorted and an unsorted region. It repeatedly finds the minimum element from the unsorted region and puts it at the end of the sorted region. Average time complexity: O(n²)"
         case .shell:
             return "An in-place comparison sort that generalizes insertion sort by allowing the exchange of items that are far apart. It uses a gap sequence to compare elements that are a certain distance apart, reducing the number of comparisons needed. Average time complexity: O(n (log n)²)"
+        case .cube:
+            return "A 3D sort that sorts elements in a 3D grid. It works by sorting elements along each dimension independently, then combining the results. Average time complexity: O(n log n)"
         }
     }
 
-        /// Maps algorithm type to the corresponding sorting function
+     /// Maps algorithm type to the corresponding sorting function
      static func getSortingFunction(for type: SortingAlgorithmType) -> ([Int], @escaping SortingStepType.StepCallback<Int>) async -> [Int] {
         switch type {
         case .bubble:
@@ -71,6 +74,8 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
             return SelectionSort.sort
         case .shell:
             return ShellSort.sort
+        case .cube:
+            return CubeSort.sort
         }
     }
 }

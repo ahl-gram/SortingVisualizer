@@ -355,6 +355,34 @@ enum SortingVisualizers {
             
             return true
             
+        case .highlight(let index):
+            // Highlight the bar for cube visualization
+            let updatedBars = await MainActor.run { () -> [SortingViewModel.SortingBar] in
+                var barsCopy = bars
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    barsCopy[index].state = .cubeHighlight // If this state doesn't exist, we'll add it
+                    params.updateBars(barsCopy)
+                }
+                return barsCopy
+            }
+            bars = updatedBars
+            
+            // Brief delay for visual effect
+            try? await Task.sleep(nanoseconds: scaledDelay / 4)
+            
+            return true
+            
+        case .unhighlight(let index):
+            // Remove highlight from the bar
+            let updatedBars = await resetBarsToUnsorted(
+                indexes: [index],
+                bars: bars,
+                params: params
+            )
+            bars = updatedBars
+            
+            return true
+            
         case .completed:
             // Mark all remaining elements as sorted and show completion animation
             await MainActor.run {

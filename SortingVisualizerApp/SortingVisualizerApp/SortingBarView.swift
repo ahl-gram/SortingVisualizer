@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum BarState {
-    case unsorted, comparing, sorted, merging, completed
+    case unsorted, comparing, sorted, merging, completed, cubeHighlight
 }
 
 struct SortingBarView: View {
@@ -68,6 +68,12 @@ struct SortingBarView: View {
                 startPoint: .leading,
                 endPoint: .trailing
             )
+        case .cubeHighlight:
+            return LinearGradient(
+                gradient: Gradient(colors: [Color.orange.opacity(0.7), Color.orange]),
+                startPoint: .leading,
+                endPoint: .trailing
+            )
         }
     }
     
@@ -78,6 +84,7 @@ struct SortingBarView: View {
         case .sorted: return Color.cyan
         case .merging: return Color.purple
         case .completed: return Color.red
+        case .cubeHighlight: return Color.orange
         }
     }
     
@@ -88,6 +95,7 @@ struct SortingBarView: View {
         case .sorted: return Color.cyan.opacity(0.3)
         case .merging: return Color.purple.opacity(0.7)
         case .completed: return Color.red.opacity(0.7)
+        case .cubeHighlight: return Color.orange.opacity(0.7)
         }
     }
 }
@@ -98,7 +106,9 @@ struct SortingBarView: View {
         SortingBarView(height: 100, state: .comparing, width: 15)
         SortingBarView(height: 150, state: .sorted, width: 20)
         SortingBarView(height: 120, state: .merging, width: 15)
-        SortingBarView(height: 80, state: .completed, width: 15)
+        SortingBarView(height: 90, state: .cubeHighlight, width: 15)
+        SortingBarView(height: 180, state: .completed, width: 10)
     }
-    .background(Color.black)
+    .padding()
+    .background(Color.black.opacity(0.1))
 } 

@@ -68,6 +68,10 @@ enum TimeSort {
                     mappedStep = .merge(i + start, value)
                 case .bucket(let i, let j):
                     mappedStep = .bucket(i + start, j)
+                case .highlight(let i):
+                    mappedStep = .highlight(i + start)
+                case .unhighlight(let i):
+                    mappedStep = .unhighlight(i + start)
                 }
                 
                 // Update the original array with the subarray changes
