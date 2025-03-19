@@ -226,7 +226,7 @@ class SortingViewModel: ObservableObject {
             // Set bar to comparing state (which will show as green highlight)
             await MainActor.run {
                 withAnimation(.easeInOut(duration: 0.2)) {
-                    bars[index].state = .comparing
+                    bars[index].state = .completed
                 }
                 
                 // Play tone based on bar height

@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum BarState {
-    case unsorted, comparing, sorted, merging
+    case unsorted, comparing, sorted, merging, completed
 }
 
 struct SortingBarView: View {
@@ -32,7 +32,7 @@ struct SortingBarView: View {
                 Rectangle()
                     .stroke(Color.black.opacity(0.3), lineWidth: 0.5)
             )
-            .animation(.easeInOut(duration: 0.3), value: state)
+            .animation(state == .completed ? .easeInOut(duration: 0.1) : .easeInOut(duration: 0.3), value: state)
             .accessibilityLabel("Bar with height \(Int(height)) and state \(state)")
     }
     
@@ -62,6 +62,12 @@ struct SortingBarView: View {
                 startPoint: .leading,
                 endPoint: .trailing
             )
+        case .completed:
+            return LinearGradient(
+                gradient: Gradient(colors: [Color(red: 1.0, green: 0.2, blue: 0.2), Color(red: 1.0, green: 0.2, blue: 0.2)]),
+                startPoint: .leading,
+                endPoint: .trailing
+            )
         }
     }
     
@@ -71,6 +77,7 @@ struct SortingBarView: View {
         case .comparing: return Color.green
         case .sorted: return Color.cyan
         case .merging: return Color.purple
+        case .completed: return Color.red
         }
     }
     
@@ -80,6 +87,7 @@ struct SortingBarView: View {
         case .comparing: return Color.green.opacity(0.7)
         case .sorted: return Color.cyan.opacity(0.3)
         case .merging: return Color.purple.opacity(0.7)
+        case .completed: return Color.red.opacity(0.7)
         }
     }
 }
@@ -90,6 +98,7 @@ struct SortingBarView: View {
         SortingBarView(height: 100, state: .comparing, width: 15)
         SortingBarView(height: 150, state: .sorted, width: 20)
         SortingBarView(height: 120, state: .merging, width: 15)
+        SortingBarView(height: 80, state: .completed, width: 15)
     }
     .background(Color.black)
 } 
