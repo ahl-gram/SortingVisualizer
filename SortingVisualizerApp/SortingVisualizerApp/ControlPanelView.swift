@@ -43,24 +43,45 @@ struct ControlPanelPreviewWrapper: View {
     @State private var selectedAlgorithm: SortingAlgorithmType = .bubble
     var width: CGFloat
     var height: CGFloat
+    var previewLayout: Bool = true // true = preview view, false = preview layout directly
     
     var body: some View {
-        ControlPanelView(
-            arraySize: $arraySize,
-            animationSpeed: $animationSpeed,
-            isAudioEnabled: $isAudioEnabled,
-            isUniformDistribution: $isUniformDistribution,
-            selectedAlgorithm: $selectedAlgorithm,
-            onRandomize: { print("Randomize tapped") },
-            onStartSorting: { print("Start tapped") },
-            onStopSorting: { print("Stop tapped") },
-            isSorting: false
-        )
-        .frame(width: width, height: height)
-        .padding()
+        if previewLayout {
+            ControlPanelView(
+                arraySize: $arraySize,
+                animationSpeed: $animationSpeed,
+                isAudioEnabled: $isAudioEnabled,
+                isUniformDistribution: $isUniformDistribution,
+                selectedAlgorithm: $selectedAlgorithm,
+                onRandomize: { print("Randomize tapped") },
+                onStartSorting: { print("Start tapped") },
+                onStopSorting: { print("Stop tapped") },
+                isSorting: false
+            )
+            .frame(width: width, height: height)
+            .padding()
+        } else {
+            ControlPanelLayout(
+                arraySize: $arraySize,
+                animationSpeed: $animationSpeed,
+                isAudioEnabled: $isAudioEnabled,
+                isUniformDistribution: $isUniformDistribution,
+                selectedAlgorithm: $selectedAlgorithm,
+                onRandomize: { print("Randomize tapped") },
+                onStartSorting: { print("Start tapped") },
+                onStopSorting: { print("Stop tapped") },
+                isSorting: false
+            )
+            .frame(width: width, height: height)
+            .padding()
+        }
     }
 }
 
-#Preview("Landscape") {
+#Preview("Landscape - View") {
     ControlPanelPreviewWrapper(width: 700, height: 200)
+}
+
+#Preview("Landscape - Layout") {
+    ControlPanelPreviewWrapper(width: 700, height: 200, previewLayout: false)
 } 

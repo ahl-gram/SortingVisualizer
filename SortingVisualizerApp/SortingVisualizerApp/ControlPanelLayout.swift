@@ -175,30 +175,5 @@ struct ControlPanelLayout: View {
 }
 
 #Preview {
-    ControlPanelPreview()
+    ControlPanelPreviewWrapper(width: 700, height: 200, previewLayout: false)
 }
-
-// Preview wrapper
-struct ControlPanelPreview: View {
-    @State private var arraySize: Double = 50
-    @State private var animationSpeed: Double = 1.0
-    @State private var isAudioEnabled: Bool = true
-    @State private var isUniformDistribution: Bool = false
-    @State private var selectedAlgorithm: SortingAlgorithmType = .bubble
-    
-    var body: some View {
-        ControlPanelLayout(
-            arraySize: $arraySize,
-            animationSpeed: $animationSpeed,
-            isAudioEnabled: $isAudioEnabled,
-            isUniformDistribution: $isUniformDistribution,
-            selectedAlgorithm: $selectedAlgorithm,
-            onRandomize: { print("Randomize tapped") },
-            onStartSorting: { print("Start tapped") },
-            onStopSorting: { print("Stop tapped") },
-            isSorting: false
-        )
-        .frame(width: 700, height: 200)
-        .padding()
-    }
-} 
