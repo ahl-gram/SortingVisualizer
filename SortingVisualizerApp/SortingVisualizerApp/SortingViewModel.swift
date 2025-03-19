@@ -96,7 +96,7 @@ class SortingViewModel: ObservableObject {
         // Start a new sorting task based on selected algorithm
         sortingTask = Task {
             // Use the generic sorting algorithm method
-            await SortingVisualizers.runSortingAlgorithm(
+            await SortingAnimator.runSortingAlgorithm(
                 type: selectedAlgorithm,
                 bars: bars,
                 animationSpeed: animationSpeed,

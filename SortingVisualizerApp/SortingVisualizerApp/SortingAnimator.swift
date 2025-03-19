@@ -1,15 +1,8 @@
-//
-//  SortingVisualizers.swift
-//  SortingVisualizerApp
-//
-//  Created for Sorting Visualizer App
-//
-
 import Foundation
 import SwiftUI
 
 // Collection of sorting visualizers
-enum SortingVisualizers {
+enum SortingAnimator {
     
     // MARK: - Common Parameters Struct
     struct SortingParams {
