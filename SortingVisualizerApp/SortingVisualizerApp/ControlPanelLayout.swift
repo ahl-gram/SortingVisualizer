@@ -4,6 +4,7 @@ struct ControlPanelLayout: View {
     @Binding var arraySize: Double
     @Binding var animationSpeed: Double
     @Binding var isAudioEnabled: Bool
+    @Binding var isEvenDistribution: Bool
     @Binding var selectedAlgorithm: SortingAlgorithmType
     var onRandomize: () -> Void
     var onStartSorting: () -> Void
@@ -115,29 +116,32 @@ struct ControlPanelLayout: View {
                     VStack(alignment: .leading) {
                         // Array Size Slider
                         HStack {
-                            Text("Array Size:")
+                            Text("📶")
                                 .opacity(isSorting ? 0.5 : 1)
-                            Spacer()
+                            Slider(value: $arraySize, in: 10...100, step: 1)
+                                .accessibilityLabel("Array Size Slider")
+                                .disabled(isSorting)
+                                .opacity(isSorting ? 0.5 : 1)
                             Text("\(Int(arraySize))")
                                 .frame(width: 40, alignment: .trailing)
                                 .opacity(isSorting ? 0.5 : 1)
                         }
+                        .padding(.bottom, geometry.size.height/16)
                         
-                        Slider(value: $arraySize, in: 10...100, step: 1)
-                            .accessibilityLabel("Array Size Slider")
-                            .disabled(isSorting)
-                            .opacity(isSorting ? 0.5 : 1)
+                        
+
                         
                         // Animation Speed Slider
                         HStack {
-                            Text("Animation Speed:")
-                            Spacer()
+                            Text("⏩")
+                            Slider(value: $animationSpeed, in: 1...20, step: 1)
+                                .accessibilityLabel("Animation Speed Slider")
                             Text("\(Int(animationSpeed))x")
                                 .frame(width: 40, alignment: .trailing)
                         }
+                        .padding(.bottom, geometry.size.height/16)
                         
-                        Slider(value: $animationSpeed, in: 1...20, step: 1)
-                            .accessibilityLabel("Animation Speed Slider")
+
                             
                         // Audio Toggle
                         Toggle(isOn: $isAudioEnabled) {
@@ -145,7 +149,14 @@ struct ControlPanelLayout: View {
                                 .padding(.trailing, 15)
                         }
                         .accessibilityLabel("Sound Effects Toggle")
-                        .padding(.top, 8)
+                        .padding(.bottom, geometry.size.height/16)
+
+                        // Distribution Toggle
+                        Toggle(isOn: $isEvenDistribution) {
+                            Text("Even Distribution")
+                                .padding(.trailing, 15)
+                        }
+                        .accessibilityLabel("Distribution Toggle")
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -168,6 +179,7 @@ struct ControlPanelPreview: View {
     @State private var arraySize: Double = 50
     @State private var animationSpeed: Double = 1.0
     @State private var isAudioEnabled: Bool = true
+    @State private var isEvenDistribution: Bool = false
     @State private var selectedAlgorithm: SortingAlgorithmType = .bubble
     
     var body: some View {
@@ -175,6 +187,7 @@ struct ControlPanelPreview: View {
             arraySize: $arraySize,
             animationSpeed: $animationSpeed,
             isAudioEnabled: $isAudioEnabled,
+            isEvenDistribution: $isEvenDistribution,
             selectedAlgorithm: $selectedAlgorithm,
             onRandomize: { print("Randomize tapped") },
             onStartSorting: { print("Start tapped") },

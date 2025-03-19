@@ -11,6 +11,7 @@ struct ControlPanelView: View {
     @Binding var arraySize: Double
     @Binding var animationSpeed: Double
     @Binding var isAudioEnabled: Bool
+    @Binding var isEvenDistribution: Bool
     @Binding var selectedAlgorithm: SortingAlgorithmType
     var onRandomize: () -> Void
     var onStartSorting: () -> Void
@@ -21,7 +22,8 @@ struct ControlPanelView: View {
             ControlPanelLayout(
                 arraySize: $arraySize,
                 animationSpeed: $animationSpeed,
-                isAudioEnabled: $isAudioEnabled,
+                isAudioEnabled: $isAudioEnabled, 
+                isEvenDistribution: $isEvenDistribution,
                 selectedAlgorithm: $selectedAlgorithm,
                 onRandomize: onRandomize,
                 onStartSorting: onStartSorting,
@@ -37,6 +39,7 @@ struct ControlPanelPreviewWrapper: View {
     @State private var arraySize: Double = 50
     @State private var animationSpeed: Double = 1.0
     @State private var isAudioEnabled: Bool = true
+    @State private var isEvenDistribution: Bool = false
     @State private var selectedAlgorithm: SortingAlgorithmType = .bubble
     var width: CGFloat
     var height: CGFloat
@@ -46,6 +49,7 @@ struct ControlPanelPreviewWrapper: View {
             arraySize: $arraySize,
             animationSpeed: $animationSpeed,
             isAudioEnabled: $isAudioEnabled,
+            isEvenDistribution: $isEvenDistribution,
             selectedAlgorithm: $selectedAlgorithm,
             onRandomize: { print("Randomize tapped") },
             onStartSorting: { print("Start tapped") },
