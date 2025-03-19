@@ -104,9 +104,6 @@ class SortingViewModel: ObservableObject {
                 updateBars: { [weak self] updatedBars in
                     self?.bars = updatedBars
                 },
-                markAllAsSorted: { [weak self] in
-                    self?.markAllAsSorted()
-                },
                 onComplete: { [weak self] in
                     guard let self = self else { return }
                     // Run the completion animation before marking sort as done
@@ -185,21 +182,6 @@ class SortingViewModel: ObservableObject {
         
         // Final pause to appreciate the completed sort
         try? await Task.sleep(nanoseconds: baseDelay * 2)
-    }
-    
-    private func markAllAsSorted() {
-        withAnimation(.easeInOut(duration: 1.0)) {
-            for i in 0..<bars.count {
-                if bars[i].state != .sorted {
-                    bars[i].state = .sorted
-                    
-                    // Play a tone for each newly sorted element
-                    if audioManager.isAudioEnabled {
-                        audioManager.playTone(forValue: AppConstants.Audio.sortedToneValue)
-                    }
-                }
-            }
-        }
     }
     
     deinit {

@@ -17,6 +17,45 @@ enum SortingVisualizers {
         let audioManager: AudioManager
         let updateBars: ([SortingViewModel.SortingBar]) -> Void
     }
+
+     /// Generic method to run any sorting algorithm
+    static func runSortingAlgorithm(
+        type: SortingAlgorithmType,
+        bars: [SortingViewModel.SortingBar],
+        animationSpeed: Double,
+        audioManager: AudioManager,
+        updateBars: @escaping ([SortingViewModel.SortingBar]) -> Void,
+        onComplete: @escaping () -> Void
+    ) async {
+        var localBars = bars
+        
+        // Create params struct for helper methods
+        let params = SortingParams(
+            animationSpeed: animationSpeed,
+            audioManager: audioManager,
+            updateBars: updateBars
+        )
+        
+        // Calculate delay once
+        let scaledDelay = calculateDelay(animationSpeed: animationSpeed)
+        
+        // Extract bar values for sorting
+        let values = localBars.map { $0.value }
+        
+        // Get the appropriate sorting algorithm function
+        let sortFunction = getSortingFunction(for: type)
+        
+        // Execute the sorting algorithm with a common step processing callback
+        _ = await sortFunction(values) { step, _ in
+            await processSortingStep(
+                step: step,
+                bars: &localBars,
+                params: params,
+                onComplete: onComplete,
+                scaledDelay: scaledDelay
+            )
+        }
+    }
     
     // MARK: - Helper Methods for Visualization
     
@@ -110,6 +149,25 @@ enum SortingVisualizers {
             return barsCopy
         }
     }
+
+    /// Mark all bars as sorted
+    private static func markAllAsSorted(
+        bars: inout [SortingViewModel.SortingBar],
+        params: SortingParams
+    ) {
+        withAnimation(.easeInOut(duration: 1.0)) {
+            for i in 0..<bars.count {
+                if bars[i].state != .sorted {
+                    bars[i].state = .sorted
+                    
+                    // Play a tone for each newly sorted element
+                    if params.audioManager.isAudioEnabled {
+                        params.audioManager.playTone(forValue: AppConstants.Audio.sortedToneValue) // High tone for sorted elements
+                    }
+                }
+            }
+        }
+    }
     
     /// Swap two bars with animation
     private static func swapBars(
@@ -137,14 +195,11 @@ enum SortingVisualizers {
         }
     }
     
-    // MARK: - Process Sorting Step
-    
     /// Process a sorting step and apply visualization
     private static func processSortingStep(
         step: SortingStep<Int>,
         bars: inout [SortingViewModel.SortingBar],
         params: SortingParams,
-        markAllAsSorted: @escaping () -> Void,
         onComplete: @escaping () -> Void,
         scaledDelay: UInt64
     ) async -> Bool {
@@ -303,15 +358,13 @@ enum SortingVisualizers {
         case .completed:
             // Mark all remaining elements as sorted and show completion animation
             await MainActor.run {
-                markAllAsSorted()
+                markAllAsSorted(bars: &bars, params: params) 
                 onComplete()
             }
             
             return false
         }
     }
-    
-    // MARK: - Generic Sorting Method
     
     /// Maps algorithm type to the corresponding sorting function
     private static func getSortingFunction(for type: SortingAlgorithmType) -> ([Int], @escaping SortingStepType.StepCallback<Int>) async -> [Int] {
@@ -334,47 +387,6 @@ enum SortingVisualizers {
             return BucketSort.sort
         case .selection:
             return SelectionSort.sort
-        }
-    }
-    
-    /// Generic method to run any sorting algorithm
-    static func runSortingAlgorithm(
-        type: SortingAlgorithmType,
-        bars: [SortingViewModel.SortingBar],
-        animationSpeed: Double,
-        audioManager: AudioManager,
-        updateBars: @escaping ([SortingViewModel.SortingBar]) -> Void,
-        markAllAsSorted: @escaping () -> Void,
-        onComplete: @escaping () -> Void
-    ) async {
-        var localBars = bars
-        
-        // Create params struct for helper methods
-        let params = SortingParams(
-            animationSpeed: animationSpeed,
-            audioManager: audioManager,
-            updateBars: updateBars
-        )
-        
-        // Calculate delay once
-        let scaledDelay = calculateDelay(animationSpeed: animationSpeed)
-        
-        // Extract bar values for sorting
-        let values = localBars.map { $0.value }
-        
-        // Get the appropriate sorting algorithm function
-        let sortFunction = getSortingFunction(for: type)
-        
-        // Execute the sorting algorithm with a common step processing callback
-        _ = await sortFunction(values) { step, _ in
-            await processSortingStep(
-                step: step,
-                bars: &localBars,
-                params: params,
-                markAllAsSorted: markAllAsSorted,
-                onComplete: onComplete,
-                scaledDelay: scaledDelay
-            )
         }
     }
 } 
