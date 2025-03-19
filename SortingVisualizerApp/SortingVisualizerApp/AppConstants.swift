@@ -1,10 +1,3 @@
-//
-//  AppConstants.swift
-//  SortingVisualizerApp
-//
-//  Created for Sorting Visualizer App
-//
-
 import Foundation
 import SwiftUI
 
@@ -45,6 +38,12 @@ enum AppConstants {
         
         /// Tone value for sorted bars
         static let sortedToneValue: Int = 200
+
+        /// Base frequency for the tone (Bflat 2 note)
+        static let baseFrequency: Float = 116.5
+
+        /// Maximum frequency for the tone (Bflat 4 note)
+        static let maxFrequency: Float = 349.66
     }
     
     // MARK: - Bar Generation Constants

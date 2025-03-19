@@ -1,10 +1,3 @@
-//
-//  AudioManager.swift
-//  SortingVisualizerApp
-//
-//  Created for Sorting Visualizer App
-//
-
 import Foundation
 import AVFoundation
 
@@ -14,6 +7,9 @@ class AudioManager {
     private var mixer: AVAudioMixerNode
     private(set) var isAudioEnabled: Bool = true
     private var outputFormat: AVAudioFormat
+    private let baseFrequency: Float = AppConstants.Audio.baseFrequency // Bflat 2 note
+    private let maxValue: Float = Float(AppConstants.Audio.maxBarValue) // Maximum possible value
+    private let duration: Float = AppConstants.Audio.toneDuration // 100ms tone
     
     init() {
         audioEngine = AVAudioEngine()
@@ -39,14 +35,10 @@ class AudioManager {
         
         // Calculate frequency based on the bar's height/value
         // Higher values produce higher pitches
-        let baseFrequency: Float = 116.5 // Bflat 2 note
-        let maxValue: Float = Float(AppConstants.Audio.maxBarValue) // Maximum possible value
         let normalizedValue = Float(value) / maxValue
-        let frequency = baseFrequency + (normalizedValue * 349.66) // Range from Bflat 2 to Bflat 4
+        let frequency = baseFrequency + (normalizedValue * AppConstants.Audio.maxFrequency) // Range from Bflat 2 to Bflat 4
         
         // Create a short tone
-        let duration: Float = 0.1 // 100ms tone
-        
         let buffer = createToneBuffer(frequency: frequency, duration: duration)
         
         // Play the tone
