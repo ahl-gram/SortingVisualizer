@@ -35,11 +35,11 @@ class SortingViewModel: ObservableObject {
     }
     
     // MARK: - Public methods
-    func randomizeArray(size: Int) {
+    func randomizeArray(size: Int, isUniformDistribution: Bool = false) {
         // Stop any ongoing sorting
         stopSorting()
         
-        // Generate a new array of bars with unique, uniformly distributed heights
+        // Generate a new array of bars with unique heights
         var newBars: [SortingBar] = []
         
         // Define height parameters
@@ -59,37 +59,44 @@ class SortingViewModel: ObservableObject {
         // Calculate the range of heights
         let heightRange = maxHeight - minHeight
         
-        // Generate a sequence of uniformly distributed heights
-        // by dividing the height range into equal steps
+        // Generate heights based on the distribution type
         var heights: [Int] = []
         
-        // If the array size is small, we can use the exact step size to get perfect distribution
-        if size <= heightRange {
-            // Calculate step size to evenly distribute heights
-            let step = heightRange / (size - 1)
+        if isUniformDistribution {
+            // Uniform distribution - evenly spaced heights
+            if size <= heightRange {
+                // Calculate step size to evenly distribute heights
+                let step = heightRange / (size - 1)
+                
+                // Generate heights with uniform distribution
+                for i in 0..<size {
+                    heights.append(minHeight + (i * step))
+                }
+            } else {
+                // When we have more bars than the height range, we need to ensure uniqueness
+                // by generating all possible heights and then sampling from them
             
-            // Generate heights with uniform distribution
-            for i in 0..<size {
-                heights.append(minHeight + (i * step))
+                // Generate all possible heights in the range
+                var allPossibleHeights = Array(minHeight...maxHeight)
+                
+                // Shuffle the heights to randomize selection
+                allPossibleHeights.shuffle()
+                    
+                // Select 'size' number of unique heights
+                heights = Array(allPossibleHeights.prefix(size))
             }
+            
+            // Shuffle the heights for final randomization
+            heights.shuffle()
         } else {
-            // When we have more bars than the height range, we need to ensure uniqueness
-            // by generating all possible heights and then sampling from them
-            
-            // Generate all possible heights in the range
-            var allPossibleHeights = Array(minHeight...maxHeight)
-            
-            // Shuffle the heights to randomize selection
-            allPossibleHeights.shuffle()
-            
-            // Select 'size' number of unique heights
-            heights = Array(allPossibleHeights.prefix(size))
+            // Random distribution - completely random heights within the range
+            for _ in 0..<size {
+                let randomHeight = Int.random(in: minHeight...maxHeight)
+                heights.append(randomHeight)
+            }
         }
         
-        // Shuffle the heights for final randomization
-        heights.shuffle()
-        
-        // Create bars with the unique heights
+        // Create bars with the generated heights
         for height in heights {
             newBars.append(SortingBar(value: height))
         }

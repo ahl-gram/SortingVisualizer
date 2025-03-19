@@ -96,7 +96,7 @@ struct ContentView: View {
                         isUniformDistribution: $isUniformDistribution,
                         selectedAlgorithm: $viewModel.selectedAlgorithm,
                         onRandomize: {
-                            viewModel.randomizeArray(size: Int(arraySize))
+                            viewModel.randomizeArray(size: Int(arraySize), isUniformDistribution: isUniformDistribution)
                         },
                         onStartSorting: {
                             viewModel.startSorting(animationSpeed: animationSpeed)
@@ -116,7 +116,7 @@ struct ContentView: View {
                 .avoidDynamicIsland()
                 .onAppear {
                     // Initialize with a random array
-                    viewModel.randomizeArray(size: Int(arraySize))
+                    viewModel.randomizeArray(size: Int(arraySize), isUniformDistribution: isUniformDistribution)
                 }
                 .onChange(of: arraySize) { newSize in
                     // Don't update during sorting
@@ -127,7 +127,7 @@ struct ContentView: View {
                     
                     // Debounce the array generation to avoid performance issues during slider dragging
                     arraySizeDebounceTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false) { _ in
-                        viewModel.randomizeArray(size: Int(newSize))
+                        viewModel.randomizeArray(size: Int(newSize), isUniformDistribution: isUniformDistribution)
                     }
                 }
                 .onChange(of: animationSpeed) { newSpeed in
@@ -135,6 +135,13 @@ struct ContentView: View {
                     if viewModel.isSorting {
                         viewModel.updateAnimationSpeed(newSpeed)
                     }
+                }
+                .onChange(of: isUniformDistribution) { newValue in
+                    // Don't update during sorting
+                    guard !viewModel.isSorting else { return }
+                    
+                    // Regenerate array with new distribution type
+                    viewModel.randomizeArray(size: Int(arraySize), isUniformDistribution: newValue)
                 }
             }
         }
