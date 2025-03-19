@@ -15,21 +15,42 @@ struct ContentView: View {
     @StateObject private var viewModel = SortingViewModel()
     @State private var safeAreaInsets: EdgeInsets = EdgeInsets()
     @State private var arraySizeDebounceTimer: Timer?
+    @State private var showAboutView: Bool = false
     
     var body: some View {
         // Remove the NavigationView
         GeometryReader { geometry in
             ZStack {
-                    // Add safe area insets reader to capture dynamic island and other insets
+                // Add safe area insets reader to capture dynamic island and other insets
                 SafeAreaInsetsReader(insets: $safeAreaInsets)
                 
                 VStack(spacing: 0) {
-                    // Title at the top
-                    Text("Sorting Visualizer")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .padding(.top, safeAreaInsets.top > 0 ? 0 : 10)
-                        .padding(.bottom, 5)
+                    // Title and info button at the top
+                    HStack {
+                        // Info button
+                        Button(action: {
+                            withAnimation(.spring()) {
+                                showAboutView = true
+                            }
+                        }) {
+                            Image(systemName: "info.circle")
+                                .font(.title2)
+                                .foregroundColor(.blue)
+                                .padding(.leading, 16)
+                        }
+                        .accessibility(label: Text("About this app"))
+                        
+                        Spacer()
+                        
+                        // Title at the top
+                        Text("Sorting Visualizer")
+                            .font(.title)
+                            .fontWeight(.bold)
+                        
+                        Spacer()
+                    }
+                    .padding(.top, safeAreaInsets.top > 0 ? 0 : 10)
+                    .padding(.bottom, 5)
                     
                     // add a spacer to the top of the view
                     Spacer()
@@ -153,6 +174,12 @@ struct ContentView: View {
             }
         }
         .respectSafeAreas() // Use our custom modifier instead of ignoring safe areas
+        .sheet(isPresented: $showAboutView) {
+            AboutView(isPresented: $showAboutView)
+                .presentationDetents([.height(350), .medium])
+                .presentationDragIndicator(.visible)
+                .presentationContentInteraction(.scrolls)
+        }
     }
 }
 
