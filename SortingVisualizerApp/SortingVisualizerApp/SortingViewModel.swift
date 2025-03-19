@@ -124,7 +124,6 @@ class SortingViewModel: ObservableObject {
                 type: selectedAlgorithm,
                 bars: bars,
                 animationSpeed: animationSpeed,
-                isAudioEnabled: isAudioEnabled,
                 audioManager: audioManager,
                 updateBars: { [weak self] updatedBars in
                     self?.bars = updatedBars
@@ -176,7 +175,6 @@ class SortingViewModel: ObservableObject {
                     type: selectedAlgorithm,
                     bars: currentBars,
                     animationSpeed: speed,
-                    isAudioEnabled: isAudioEnabled,
                     audioManager: audioManager,
                     updateBars: { [weak self] updatedBars in
                         self?.bars = updatedBars
@@ -230,7 +228,7 @@ class SortingViewModel: ObservableObject {
                 }
                 
                 // Play tone based on bar height
-                if isAudioEnabled {
+                if audioManager.isAudioEnabled {
                     audioManager.playTone(forValue: bars[index].value)
                 }
             }
@@ -257,7 +255,7 @@ class SortingViewModel: ObservableObject {
                     bars[i].state = .sorted
                     
                     // Play a tone for each newly sorted element
-                    if isAudioEnabled {
+                    if audioManager.isAudioEnabled {
                         audioManager.playTone(forValue: AppConstants.Audio.sortedToneValue)
                     }
                 }

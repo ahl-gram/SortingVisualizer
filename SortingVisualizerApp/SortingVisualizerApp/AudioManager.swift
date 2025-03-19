@@ -12,7 +12,7 @@ class AudioManager {
     private var audioEngine: AVAudioEngine
     private var tonePlayer: AVAudioPlayerNode
     private var mixer: AVAudioMixerNode
-    private var isAudioEnabled: Bool = true
+    private(set) var isAudioEnabled: Bool = true
     private var outputFormat: AVAudioFormat
     
     init() {

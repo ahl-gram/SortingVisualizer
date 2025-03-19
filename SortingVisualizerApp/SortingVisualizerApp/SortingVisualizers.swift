@@ -14,7 +14,6 @@ enum SortingVisualizers {
     // MARK: - Common Parameters Struct
     struct SortingParams {
         let animationSpeed: Double
-        let isAudioEnabled: Bool
         let audioManager: AudioManager
         let updateBars: ([SortingViewModel.SortingBar]) -> Void
     }
@@ -45,7 +44,7 @@ enum SortingVisualizers {
             }
             
             // Play tone for the first bar being compared
-            if params.isAudioEnabled && !indexes.isEmpty {
+            if params.audioManager.isAudioEnabled && !indexes.isEmpty {
                 params.audioManager.playTone(forValue: barsCopy[indexes[0]].value)
             }
             
@@ -53,7 +52,7 @@ enum SortingVisualizers {
         }
         
         // If there's a second bar, play its tone after a small delay
-        if indexes.count > 1 && params.isAudioEnabled {
+        if indexes.count > 1 && params.audioManager.isAudioEnabled {
             try? await Task.sleep(nanoseconds: calculateDelay(animationSpeed: params.animationSpeed))
             
             await MainActor.run {
@@ -104,7 +103,7 @@ enum SortingVisualizers {
             }
             
             // Play a higher tone for sorted element
-            if params.isAudioEnabled {
+            if params.audioManager.isAudioEnabled {
                 params.audioManager.playTone(forValue: AppConstants.Audio.sortedToneValue) // High tone for sorted elements
             }
             
@@ -130,7 +129,7 @@ enum SortingVisualizers {
                 params.updateBars(barsCopy)
             }
             
-            if params.isAudioEnabled {
+            if params.audioManager.isAudioEnabled {
                 params.audioManager.playTone(forValue: barsCopy[index1].value)
             }
             
@@ -192,7 +191,7 @@ enum SortingVisualizers {
                         params.updateBars(barsCopy)
                     }
                     
-                    if params.isAudioEnabled {
+                    if params.audioManager.isAudioEnabled {
                         params.audioManager.playTone(forValue: barsCopy[index1].value)
                     }
                     
@@ -239,7 +238,7 @@ enum SortingVisualizers {
                     params.updateBars(barsCopy)
                 }
                 
-                if params.isAudioEnabled {
+                if params.audioManager.isAudioEnabled {
                     params.audioManager.playTone(forValue: barsCopy[index].value)
                 }
                 
@@ -268,7 +267,7 @@ enum SortingVisualizers {
                     params.updateBars(barsCopy)
                 }
                 
-                if params.isAudioEnabled {
+                if params.audioManager.isAudioEnabled {
                     // Play a tone related to the bucket index (0-9)
                     let bucketTone = 100 + (bucketIndex * 10)
                     params.audioManager.playTone(forValue: bucketTone)
@@ -319,7 +318,6 @@ enum SortingVisualizers {
         type: SortingAlgorithmType,
         bars: [SortingViewModel.SortingBar],
         animationSpeed: Double,
-        isAudioEnabled: Bool,
         audioManager: AudioManager,
         updateBars: @escaping ([SortingViewModel.SortingBar]) -> Void,
         markAllAsSorted: @escaping () -> Void,
@@ -330,7 +328,6 @@ enum SortingVisualizers {
         // Create params struct for helper methods
         let params = SortingParams(
             animationSpeed: animationSpeed,
-            isAudioEnabled: isAudioEnabled,
             audioManager: audioManager,
             updateBars: updateBars
         )
