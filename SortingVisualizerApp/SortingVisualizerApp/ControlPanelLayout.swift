@@ -132,7 +132,7 @@ struct ControlPanelLayout: View {
                         // Animation Speed Slider
                         HStack {
                             Text("⏩")
-                            Slider(value: $animationSpeed, in: 1...20, step: 1)
+                            Slider(value: $animationSpeed, in: AppConstants.Animation.minAnimationSpeed...AppConstants.Animation.maxAnimationSpeed, step: 1)
                                 .accessibilityLabel("Animation Speed Slider")
                             Text("\(Int(animationSpeed))x")
                                 .frame(width: 40, alignment: .trailing)

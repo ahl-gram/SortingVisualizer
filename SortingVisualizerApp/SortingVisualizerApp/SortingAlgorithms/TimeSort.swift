@@ -26,7 +26,7 @@ enum TimeSort {
         }
         
         // For larger arrays, use merge sort with insertion sort for small subarrays
-        var result = await timeSortHelper(array: arr, start: 0, end: n - 1, onStep: onStep)
+        let result = await timeSortHelper(array: arr, start: 0, end: n - 1, onStep: onStep)
         
         // Report completion
         _ = await onStep(SortingStep.completed, result)

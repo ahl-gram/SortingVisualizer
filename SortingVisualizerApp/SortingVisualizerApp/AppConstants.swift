@@ -27,6 +27,12 @@ enum AppConstants {
         
         /// Duration for marking bars as sorted
         static let sortedMarkDuration: Double = 0.5
+        
+        /// Minimum animation speed
+        static let minAnimationSpeed: Double = 1.0
+        
+        /// Maximum animation speed
+        static let maxAnimationSpeed: Double = 20.0
     }
     
     // MARK: - Audio Constants
