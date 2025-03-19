@@ -44,4 +44,30 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
             return "A simple in-place comparison sort that divides the input into a sorted and an unsorted region. It repeatedly finds the minimum element from the unsorted region and puts it at the end of the sorted region. Average time complexity: O(n²)"
         }
     }
+
+        /// Maps algorithm type to the corresponding sorting function
+     static func getSortingFunction(for type: SortingAlgorithmType) -> ([Int], @escaping SortingStepType.StepCallback<Int>) async -> [Int] {
+        switch type {
+        case .bubble:
+            return BubbleSort.sort
+        case .quick:
+            return QuickSort.sort
+        case .merge:
+            return MergeSort.sort
+        case .insertion:
+            return InsertionSort.sort
+        case .heap:
+            return HeapSort.sort
+        case .radix:
+            return RadixSort.sort
+        case .time:
+            return TimeSort.sort
+        case .bucket:
+            return BucketSort.sort
+        case .selection:
+            return SelectionSort.sort
+        }
+    }
 }
+
+

@@ -43,7 +43,7 @@ enum SortingVisualizers {
         let values = localBars.map { $0.value }
         
         // Get the appropriate sorting algorithm function
-        let sortFunction = getSortingFunction(for: type)
+        let sortFunction = SortingAlgorithmType.getSortingFunction(for: type)
         
         // Execute the sorting algorithm with a common step processing callback
         _ = await sortFunction(values) { step, _ in
@@ -363,30 +363,6 @@ enum SortingVisualizers {
             }
             
             return false
-        }
-    }
-    
-    /// Maps algorithm type to the corresponding sorting function
-    private static func getSortingFunction(for type: SortingAlgorithmType) -> ([Int], @escaping SortingStepType.StepCallback<Int>) async -> [Int] {
-        switch type {
-        case .bubble:
-            return BubbleSort.sort
-        case .quick:
-            return QuickSort.sort
-        case .merge:
-            return MergeSort.sort
-        case .insertion:
-            return InsertionSort.sort
-        case .heap:
-            return HeapSort.sort
-        case .radix:
-            return RadixSort.sort
-        case .time:
-            return TimeSort.sort
-        case .bucket:
-            return BucketSort.sort
-        case .selection:
-            return SelectionSort.sort
         }
     }
 } 
