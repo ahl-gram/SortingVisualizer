@@ -134,43 +134,6 @@ class SortingViewModel: ObservableObject {
     
     func updateAnimationSpeed(_ speed: Double) {
         currentAnimationSpeed = speed
-        
-        // If currently sorting, restart the sorting with the new speed
-        if isSorting {
-            // Store current bars state
-            let currentBars = bars
-            
-            // Cancel current sorting task
-            sortingTask?.cancel()
-            sortingTask = nil
-            
-            // Start a new sorting task with the updated speed
-            sortingTask = Task {
-                // Use the generic sorting algorithm method
-                await SortingVisualizers.runSortingAlgorithm(
-                    type: selectedAlgorithm,
-                    bars: currentBars,
-                    animationSpeed: speed,
-                    audioManager: audioManager,
-                    updateBars: { [weak self] updatedBars in
-                        self?.bars = updatedBars
-                    },
-                    markAllAsSorted: { [weak self] in
-                        self?.markAllAsSorted()
-                    },
-                    onComplete: { [weak self] in
-                        guard let self = self else { return }
-                        // Run the completion animation before marking sort as done
-                        Task {
-                            await self.playCompletionAnimation(animationSpeed: speed)
-                            await MainActor.run {
-                                self.isSorting = false
-                            }
-                        }
-                    }
-                )
-            }
-        }
     }
     
     /// Highlights bars in order from shortest to tallest with a sequential animation

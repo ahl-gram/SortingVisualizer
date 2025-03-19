@@ -132,10 +132,14 @@ struct ControlPanelLayout: View {
                         // Animation Speed Slider
                         HStack {
                             Text("⏩")
+                                 .opacity(isSorting ? 0.5 : 1)
                             Slider(value: $animationSpeed, in: AppConstants.Animation.minAnimationSpeed...AppConstants.Animation.maxAnimationSpeed, step: 1)
                                 .accessibilityLabel("Animation Speed Slider")
+                                .disabled(isSorting)
+                                .opacity(isSorting ? 0.5 : 1)
                             Text("\(Int(animationSpeed))x")
                                 .frame(width: 40, alignment: .trailing)
+                                .opacity(isSorting ? 0.5 : 1)
                         }
                         .padding(.bottom, geometry.size.height/16)
                         
