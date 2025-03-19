@@ -11,7 +11,7 @@ import Combine
 struct ContentView: View {
     @State private var arraySize: Double = 50
     @State private var animationSpeed: Double = 1.0
-    @State private var isEvenDistribution: Bool = false
+    @State private var isUniformDistribution: Bool = false
     @StateObject private var viewModel = SortingViewModel()
     @State private var safeAreaInsets: EdgeInsets = EdgeInsets()
     @State private var arraySizeDebounceTimer: Timer?
@@ -93,7 +93,7 @@ struct ContentView: View {
                         arraySize: $arraySize,
                         animationSpeed: $animationSpeed,
                         isAudioEnabled: $viewModel.isAudioEnabled,
-                        isEvenDistribution: $isEvenDistribution,
+                        isUniformDistribution: $isUniformDistribution,
                         selectedAlgorithm: $viewModel.selectedAlgorithm,
                         onRandomize: {
                             viewModel.randomizeArray(size: Int(arraySize))

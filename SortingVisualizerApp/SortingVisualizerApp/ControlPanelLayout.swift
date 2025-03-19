@@ -4,7 +4,7 @@ struct ControlPanelLayout: View {
     @Binding var arraySize: Double
     @Binding var animationSpeed: Double
     @Binding var isAudioEnabled: Bool
-    @Binding var isEvenDistribution: Bool
+    @Binding var isUniformDistribution: Bool
     @Binding var selectedAlgorithm: SortingAlgorithmType
     var onRandomize: () -> Void
     var onStartSorting: () -> Void
@@ -84,6 +84,7 @@ struct ControlPanelLayout: View {
                                     .cornerRadius(AppConstants.UI.cornerRadius)
                             }
                             .disabled(isSorting)
+                            .opacity(isSorting ? 0.5 : 1)
                             .accessibilityLabel("Randomize Button")
                             
                             // Start/Stop Sorting Button
@@ -128,9 +129,6 @@ struct ControlPanelLayout: View {
                         }
                         .padding(.bottom, geometry.size.height/16)
                         
-                        
-
-                        
                         // Animation Speed Slider
                         HStack {
                             Text("⏩")
@@ -152,10 +150,12 @@ struct ControlPanelLayout: View {
                         .padding(.bottom, geometry.size.height/16)
 
                         // Distribution Toggle
-                        Toggle(isOn: $isEvenDistribution) {
-                            Text("Even Distribution")
+                        Toggle(isOn: $isUniformDistribution) {
+                            Text("Uniform Distribution")
                                 .padding(.trailing, 15)
+                                .opacity(isSorting ? 0.5 : 1)
                         }
+                        .disabled(isSorting)
                         .accessibilityLabel("Distribution Toggle")
                     }
                     .frame(maxWidth: .infinity)
@@ -179,7 +179,7 @@ struct ControlPanelPreview: View {
     @State private var arraySize: Double = 50
     @State private var animationSpeed: Double = 1.0
     @State private var isAudioEnabled: Bool = true
-    @State private var isEvenDistribution: Bool = false
+    @State private var isUniformDistribution: Bool = false
     @State private var selectedAlgorithm: SortingAlgorithmType = .bubble
     
     var body: some View {
@@ -187,7 +187,7 @@ struct ControlPanelPreview: View {
             arraySize: $arraySize,
             animationSpeed: $animationSpeed,
             isAudioEnabled: $isAudioEnabled,
-            isEvenDistribution: $isEvenDistribution,
+            isUniformDistribution: $isUniformDistribution,
             selectedAlgorithm: $selectedAlgorithm,
             onRandomize: { print("Randomize tapped") },
             onStartSorting: { print("Start tapped") },
