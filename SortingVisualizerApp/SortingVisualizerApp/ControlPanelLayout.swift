@@ -15,7 +15,7 @@ struct ControlPanelLayout: View {
             VStack(spacing: 5) {
                 HStack(alignment: .top, spacing: 10) {
                     // Left column - algorithm picker, description, and buttons
-                    VStack(alignment: .leading, spacing: 6) {
+                    VStack(alignment: .leading) {
                         // Algorithm Picker - Dropdown style
                         HStack {
                             Text("Algorithm:")
@@ -45,7 +45,7 @@ struct ControlPanelLayout: View {
                                         .foregroundColor(.gray)
                                 }
                                 .frame(width: 180)
-                                .padding(.vertical, 6)
+                                .padding(.vertical, 3)
                                 .padding(.horizontal, 8)
                                 .background(
                                     RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadius)
@@ -112,7 +112,7 @@ struct ControlPanelLayout: View {
                     .frame(maxWidth: .infinity)
                     
                     // Right column - sliders and audio toggle
-                    VStack(alignment: .leading, spacing: 6) {
+                    VStack(alignment: .leading) {
                         // Array Size Slider
                         HStack {
                             Text("Array Size:")
