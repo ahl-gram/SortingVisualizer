@@ -317,23 +317,23 @@ enum SortingVisualizers {
     private static func getSortingFunction(for type: SortingAlgorithmType) -> ([Int], @escaping SortingStepType.StepCallback<Int>) async -> [Int] {
         switch type {
         case .bubble:
-            return SortingAlgorithms.bubbleSort
+            return BubbleSort.sort
         case .quick:
-            return SortingAlgorithms.quickSort
+            return QuickSort.sort
         case .merge:
-            return SortingAlgorithms.mergeSort
+            return MergeSort.sort
         case .insertion:
-            return SortingAlgorithms.insertionSort
+            return InsertionSort.sort
         case .heap:
-            return SortingAlgorithms.heapSort
+            return HeapSort.sort
         case .radix:
-            return SortingAlgorithms.radixSort
+            return RadixSort.sort
         case .time:
-            return SortingAlgorithms.timeSort
+            return TimeSort.sort
         case .bucket:
-            return SortingAlgorithms.bucketSort
+            return BucketSort.sort
         case .selection:
-            return SortingAlgorithms.selectionSort
+            return SelectionSort.sort
         }
     }
     
