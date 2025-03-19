@@ -19,6 +19,7 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
     case time = "Time Sort"
     case bucket = "Bucket Sort"
     case selection = "Selection Sort"
+    case shell = "Shell Sort"
     
     var id: String { self.rawValue }
     
@@ -42,6 +43,8 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
             return "A distribution sort that distributes elements into a number of buckets, sorts each bucket individually, and then concatenates the buckets. Performs best with uniform distributions. Average time complexity: O(n+k), where k is the number of buckets"
         case .selection:
             return "A simple in-place comparison sort that divides the input into a sorted and an unsorted region. It repeatedly finds the minimum element from the unsorted region and puts it at the end of the sorted region. Average time complexity: O(n²)"
+        case .shell:
+            return "An in-place comparison sort that generalizes insertion sort by allowing the exchange of items that are far apart. It uses a gap sequence to compare elements that are a certain distance apart, reducing the number of comparisons needed. Average time complexity: O(n (log n)²)"
         }
     }
 
@@ -66,6 +69,8 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
             return BucketSort.sort
         case .selection:
             return SelectionSort.sort
+        case .shell:
+            return ShellSort.sort
         }
     }
 }
