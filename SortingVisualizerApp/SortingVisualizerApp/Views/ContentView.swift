@@ -177,7 +177,7 @@ struct ContentView: View {
         .respectSafeAreas() // Use our custom modifier instead of ignoring safe areas
         .sheet(isPresented: $showAboutView) {
             AboutView(isPresented: $showAboutView)
-                .presentationDetents([.height(350), .medium])
+                .presentationDetents([.height(320), .medium])
                 .presentationDragIndicator(.visible)
                 .presentationContentInteraction(.scrolls)
         }
