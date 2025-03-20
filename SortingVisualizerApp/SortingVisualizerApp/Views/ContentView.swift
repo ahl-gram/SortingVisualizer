@@ -31,6 +31,7 @@ struct ContentView: View {
                         Button(action: {
                             withAnimation(.spring()) {
                                 showAboutView = true
+                                HapticManager.shared.buttonTap()
                             }
                         }) {
                             Image(systemName: "info.circle")

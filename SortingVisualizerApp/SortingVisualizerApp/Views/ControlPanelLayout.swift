@@ -11,6 +11,38 @@ struct ControlPanelLayout: View {
     var onStopSorting: () -> Void
     var isSorting: Bool
     
+    // Track previous values for sliders to determine when to trigger haptics
+    @State private var previousArraySize: Double = 50
+    @State private var previousAnimationSpeed: Double = 1.0
+    
+    private func hapticRandomize() {
+        HapticManager.shared.mediumImpact()
+        onRandomize()
+    }
+    
+    private func hapticStartSorting() {
+        HapticManager.shared.success()
+        onStartSorting()
+    }
+    
+    private func hapticStopSorting() {
+        HapticManager.shared.error()
+        onStopSorting()
+    }
+    
+    // Helper to check slider thresholds and provide appropriate haptic feedback
+    private func checkSliderThresholds(value: Double, range: ClosedRange<Double>, step: Double) {
+        // Provide haptic feedback at specific threshold points
+        let thresholds: [Double] = [range.lowerBound, (range.upperBound + range.lowerBound) / 2, range.upperBound]
+        
+        for threshold in thresholds {
+            if abs(value - threshold) < step / 2 {
+                HapticManager.shared.sliderThreshold()
+                break
+            }
+        }
+    }
+    
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 5) {
@@ -28,6 +60,7 @@ struct ControlPanelLayout: View {
                                 ForEach(SortingAlgorithmType.allCases.sorted(by: { $0.rawValue > $1.rawValue })) { algorithm in
                                     Button(action: {
                                         selectedAlgorithm = algorithm
+                                        HapticManager.shared.buttonTap()
                                     }) {
                                         Text(algorithm.rawValue)
                                         if selectedAlgorithm == algorithm {
@@ -75,7 +108,7 @@ struct ControlPanelLayout: View {
                         // Randomize and Start/Stop Buttons
                         HStack(spacing: 10) {
                             // Randomize Button
-                            Button(action: onRandomize) {
+                            Button(action: hapticRandomize) {
                                 Text("Randomize")
                                     .padding(.vertical, 8)
                                     .frame(maxWidth: .infinity)
@@ -89,7 +122,7 @@ struct ControlPanelLayout: View {
                             
                             // Start/Stop Sorting Button
                             if isSorting {
-                                Button(action: onStopSorting) {
+                                Button(action: hapticStopSorting) {
                                     Text("Stop")
                                         .padding(.vertical, 8)
                                         .frame(maxWidth: .infinity)
@@ -99,7 +132,7 @@ struct ControlPanelLayout: View {
                                 }
                                 .accessibilityLabel("Stop Button")
                             } else {
-                                Button(action: onStartSorting) {
+                                Button(action: hapticStartSorting) {
                                     Text("Start")
                                         .padding(.vertical, 8)
                                         .frame(maxWidth: .infinity)
@@ -123,6 +156,12 @@ struct ControlPanelLayout: View {
                                 .accessibilityLabel("Array Size Slider")
                                 .disabled(isSorting)
                                 .opacity(isSorting ? 0.5 : 1)
+                                .onChange(of: arraySize) { _, newValue in
+                                    HapticManager.shared.sliderChanged()
+                                    // Check if we've crossed a threshold
+                                    checkSliderThresholds(value: newValue, range: 10...100, step: 1)
+                                    previousArraySize = newValue
+                                }
                             Text("\(Int(arraySize))")
                                 .frame(width: 40, alignment: .trailing)
                                 .opacity(isSorting ? 0.5 : 1)
@@ -137,6 +176,16 @@ struct ControlPanelLayout: View {
                                 .accessibilityLabel("Animation Speed Slider")
                                 .disabled(isSorting)
                                 .opacity(isSorting ? 0.5 : 1)
+                                .onChange(of: animationSpeed) { _, newValue in
+                                    HapticManager.shared.sliderChanged()
+                                    // Check if we've crossed a threshold
+                                    checkSliderThresholds(
+                                        value: newValue, 
+                                        range: AppConstants.Animation.minAnimationSpeed...AppConstants.Animation.maxAnimationSpeed,
+                                        step: 1
+                                    )
+                                    previousAnimationSpeed = newValue
+                                }
                             Text("\(Int(animationSpeed))x")
                                 .frame(width: 40, alignment: .trailing)
                                 .opacity(isSorting ? 0.5 : 1)
@@ -152,6 +201,9 @@ struct ControlPanelLayout: View {
                         }
                         .accessibilityLabel("Sound Effects Toggle")
                         .padding(.bottom, geometry.size.height/16)
+                        .onChange(of: isAudioEnabled) { _, _ in
+                            HapticManager.shared.buttonTap()
+                        }
 
                         // Distribution Toggle
                         Toggle(isOn: $isUniformDistribution) {
@@ -161,6 +213,9 @@ struct ControlPanelLayout: View {
                         }
                         .disabled(isSorting)
                         .accessibilityLabel("Distribution Toggle")
+                        .onChange(of: isUniformDistribution) { _, _ in
+                            HapticManager.shared.buttonTap()
+                        }
                     }
                     .frame(maxWidth: .infinity)
                 }
