@@ -26,19 +26,28 @@ struct ControlPanelLayout: View {
     }
     
     private func hapticStopSorting() {
-        HapticManager.shared.error()
+        HapticManager.shared.success()
         onStopSorting()
     }
     
     // Helper to check slider thresholds and provide appropriate haptic feedback
     private func checkSliderThresholds(value: Double, range: ClosedRange<Double>, step: Double) {
-        // Provide haptic feedback at specific threshold points
-        let thresholds: [Double] = [range.lowerBound, (range.upperBound + range.lowerBound) / 2, range.upperBound]
-        
-        for threshold in thresholds {
-            if abs(value - threshold) < step / 2 {
+        // For array size, we want feedback at 10, 20, 30, etc.
+        if range.lowerBound == 10 && range.upperBound == 100 {
+            // Check if we're at a multiple of 10
+            let roundedValue = round(value / 10) * 10
+            if abs(value - roundedValue) < step / 2 {
                 HapticManager.shared.sliderThreshold()
-                break
+            }
+        } else {
+            // For other sliders, use min, mid, max points
+            let thresholds: [Double] = [range.lowerBound, (range.upperBound + range.lowerBound) / 2, range.upperBound]
+            
+            for threshold in thresholds {
+                if abs(value - threshold) < step / 2 {
+                    HapticManager.shared.sliderThreshold()
+                    break
+                }
             }
         }
     }
@@ -177,8 +186,7 @@ struct ControlPanelLayout: View {
                                 .disabled(isSorting)
                                 .opacity(isSorting ? 0.5 : 1)
                                 .onChange(of: animationSpeed) { _, newValue in
-                                    HapticManager.shared.sliderChanged()
-                                    // Check if we've crossed a threshold
+                                    // Only check thresholds, don't provide feedback on every change
                                     checkSliderThresholds(
                                         value: newValue, 
                                         range: AppConstants.Animation.minAnimationSpeed...AppConstants.Animation.maxAnimationSpeed,
@@ -192,8 +200,6 @@ struct ControlPanelLayout: View {
                         }
                         .padding(.bottom, geometry.size.height/16)
                         
-
-                            
                         // Audio Toggle
                         Toggle(isOn: $isAudioEnabled) {
                             Text("Sound Effects")
@@ -201,9 +207,6 @@ struct ControlPanelLayout: View {
                         }
                         .accessibilityLabel("Sound Effects Toggle")
                         .padding(.bottom, geometry.size.height/16)
-                        .onChange(of: isAudioEnabled) { _, _ in
-                            HapticManager.shared.buttonTap()
-                        }
 
                         // Distribution Toggle
                         Toggle(isOn: $isUniformDistribution) {
@@ -213,9 +216,6 @@ struct ControlPanelLayout: View {
                         }
                         .disabled(isSorting)
                         .accessibilityLabel("Distribution Toggle")
-                        .onChange(of: isUniformDistribution) { _, _ in
-                            HapticManager.shared.buttonTap()
-                        }
                     }
                     .frame(maxWidth: .infinity)
                 }
