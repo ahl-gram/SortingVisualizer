@@ -1,6 +1,6 @@
 # Sorting Visualizer App
 
-A SwiftUI-based iOS application built with Cursor, and help from Claude and ChatGPT (vibe-coding), that provides an interactive and educational visualization of various sorting algorithms with real-time animation and audio feedback.
+A SwiftUI-based iOS application built with Cursor, and help from Claude and ChatGPT that provides an interactive and educational visualization of various sorting algorithms with real-time animation and audio feedback.
 
 ## Features
 
@@ -50,16 +50,6 @@ A SwiftUI-based iOS application built with Cursor, and help from Claude and Chat
 - iOS 15.0+
 - Xcode 14.0+
 - Swift 5.0+
-
-## Project Structure
-
-The app follows the MVVM architecture pattern:
-
-- **Models**: Data structures like `SortingStep`
-- **Views**: UI components including `ContentView`, `SortingBarView`, `ControlPanelView`
-- **ViewModels**: Logic layer with `SortingViewModel`
-- **Utils**: Helpers including `AudioManager`, `SortingAnimator`
-- **SortingAlgorithms**: Individual implementations of each sorting algorithm
 
 ## Installation
 
