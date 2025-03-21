@@ -1,4 +1,4 @@
-# Sorting Visualizer App
+# Sorting Visualizer
 
 A SwiftUI-based iOS application built with Cursor, and help from Claude and ChatGPT that provides an interactive and educational visualization of various sorting algorithms with real-time animation and audio feedback.
 
