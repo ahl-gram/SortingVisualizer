@@ -122,7 +122,15 @@ struct AboutView: View {
                                     .foregroundColor(.blue)
                             }
                         }
-                        
+
+                        HStack {
+                            Text("Inspired by \"The Sound of Sorting\" by Timo Bingmann")
+                            Spacer()
+                            Link(destination: URL(string: "https://panthema.net/2013/sound-of-sorting/")!) {
+                                Image(systemName: "arrow.up.right.square")
+                                    .foregroundColor(.blue)
+                            }
+                        }
                         HStack {
                             Text("Found a bug? Report an issue")
                             Spacer()
