@@ -36,10 +36,10 @@ struct ControlPanelView: View {
 
 // Preview wrapper
 struct ControlPanelPreviewWrapper: View {
-    @State private var arraySize: Double = 50
-    @State private var animationSpeed: Double = 1.0
-    @State private var isAudioEnabled: Bool = true
-    @State private var isUniformDistribution: Bool = false
+    @State private var arraySize: Double = AppConstants.DefaultValues.arraySize
+    @State private var animationSpeed: Double = AppConstants.DefaultValues.animationSpeed
+    @State private var isUniformDistribution: Bool = AppConstants.DefaultValues.isUniformDistribution
+    @State private var isAudioEnabled: Bool = AppConstants.DefaultValues.isAudioEnabled
     @State private var selectedAlgorithm: SortingAlgorithmType = .bubble
     var width: CGFloat
     var height: CGFloat

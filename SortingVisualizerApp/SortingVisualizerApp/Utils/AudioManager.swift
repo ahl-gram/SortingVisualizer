@@ -5,7 +5,7 @@ class AudioManager {
     private var audioEngine: AVAudioEngine
     private var tonePlayer: AVAudioPlayerNode
     private var mixer: AVAudioMixerNode
-    private(set) var isAudioEnabled: Bool = true
+    private(set) var isAudioEnabled: Bool = AppConstants.DefaultValues.isAudioEnabled
     private var outputFormat: AVAudioFormat
     private let baseFrequency: Float = AppConstants.Audio.baseFrequency // Bflat 2 note
     private let maxValue: Float = Float(AppConstants.Audio.maxBarValue) // Maximum possible value

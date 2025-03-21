@@ -60,4 +60,19 @@ enum AppConstants {
         /// Standard corner radius for UI elements
         static let cornerRadius: CGFloat = 8
     }
+    
+    // MARK: - Default Values
+    enum DefaultValues {
+        /// Default size of the array to be sorted
+        static let arraySize: Double = 25
+        
+        /// Default animation speed
+        static let animationSpeed: Double = 12.0
+        
+        /// Default distribution type (uniform or not)
+        static let isUniformDistribution: Bool = false
+
+        /// Default status of the audio
+        static let isAudioEnabled: Bool = false
+    }
 } 

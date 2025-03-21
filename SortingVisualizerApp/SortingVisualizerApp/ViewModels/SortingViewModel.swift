@@ -11,7 +11,7 @@ import SwiftUI
 class SortingViewModel: ObservableObject {
     @Published var bars: [SortingBar] = []
     @Published var isSorting: Bool = false
-    @Published var isAudioEnabled: Bool = true {
+    @Published var isAudioEnabled: Bool = AppConstants.DefaultValues.isAudioEnabled {
         didSet {
             audioManager.setAudioEnabled(isAudioEnabled)
         }

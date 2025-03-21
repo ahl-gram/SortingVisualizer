@@ -9,9 +9,9 @@ import SwiftUI
 import Combine
 
 struct ContentView: View {
-    @State private var arraySize: Double = 50
-    @State private var animationSpeed: Double = 1.0
-    @State private var isUniformDistribution: Bool = false
+    @State private var arraySize: Double = AppConstants.DefaultValues.arraySize
+    @State private var animationSpeed: Double = AppConstants.DefaultValues.animationSpeed
+    @State private var isUniformDistribution: Bool = AppConstants.DefaultValues.isUniformDistribution
     @StateObject private var viewModel = SortingViewModel()
     @State private var safeAreaInsets: EdgeInsets = EdgeInsets()
     @State private var arraySizeDebounceTimer: Timer?
