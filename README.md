@@ -47,7 +47,7 @@ A SwiftUI-based iOS application built with Cursor, and help from Claude and Chat
 
 ## Requirements
 
-- iOS 15.0+
+- iOS 17.6+
 - Xcode 14.0+
 - Swift 5.0+
 
