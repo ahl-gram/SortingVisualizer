@@ -20,6 +20,7 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
     case bucket = "Bucket Sort"
     case selection = "Selection Sort"
     case shell = "Shell Sort"
+    case cube = "Cube Sort"
     
     var id: String { self.rawValue }
     
@@ -45,6 +46,8 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
             return "A simple in-place comparison sort that divides the input into a sorted and an unsorted region. It repeatedly finds the minimum element from the unsorted region and puts it at the end of the sorted region. Average time complexity: O(n²)"
         case .shell:
             return "An in-place comparison sort that generalizes insertion sort by allowing the exchange of items that are far apart. It uses a gap sequence to compare elements that are a certain distance apart, reducing the number of comparisons needed. Average time complexity: O(n (log n)²)"
+        case .cube:
+            return "A sort that works by dividing an array into small cubes, sorting each cube, and then merging the cubes back together. Average time complexity: O(n log n)"
         }
     }
 
@@ -71,6 +74,8 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
             return SelectionSort.sort
         case .shell:
             return ShellSort.sort
+        case .cube:
+            return CubeSort.sort
         }
     }
 }
