@@ -21,7 +21,8 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
     case selection = "Selection Sort"
     case shell = "Shell Sort"
     case cube = "Cube Sort"
-    
+    case bogo = "Bogo Sort"
+
     var id: String { self.rawValue }
     
     var description: String {
@@ -47,7 +48,9 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
         case .shell:
             return "An in-place comparison sort that generalizes insertion sort by allowing the exchange of items that are far apart. It uses a gap sequence to compare elements that are a certain distance apart, reducing the number of comparisons needed. Average time complexity: O(n (log n)²)"
         case .cube:
-            return "This simplified sort works by dividing an array into small 'cubes', sorting each 'cube', and then merging the 'cubes' back together. Average time complexity: O(n log n)"
+            return "A simplified version of Cube Sort that works by dividing an array into small 'cubes', sorting each 'cube', and then merging the 'cubes' back together. Average time complexity: O(n log n)"
+        case .bogo:
+            return "A highly inefficient sorting algorithm used for educational or humorous purposes. It works by repeatedly shuffling the array until it happens to be sorted. Average time complexity: O(n!)"
         }
     }
 
@@ -76,6 +79,8 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
             return ShellSort.sort
         case .cube:
             return CubeSort.sort
+        case .bogo:
+            return BogoSort.sort
         }
     }
 }

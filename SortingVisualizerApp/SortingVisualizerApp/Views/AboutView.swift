@@ -60,7 +60,7 @@ struct AboutView: View {
                             .font(.headline)
                             .padding(.bottom, 2)
                         
-                        FeatureRow(icon: "list.bullet", text: "10 different sorting algorithms")
+                        FeatureRow(icon: "list.bullet", text: "12 different sorting algorithms")
                         FeatureRow(icon: "slider.horizontal.3", text: "Adjustable array size and animation speed")
                         FeatureRow(icon: "speaker.wave.2.fill", text: "Audio feedback with pitch variation")
                         FeatureRow(icon: "chart.bar.fill", text: "Real-time visual representation of sorting steps")
@@ -132,7 +132,7 @@ struct AboutView: View {
                             }
                         }
                         HStack {
-                            Text("Found a bug? Report an issue")
+                            Text("Found a bug? Report an issue!")
                             Spacer()
                             Link(destination: URL(string: "https://github.com/ahl-gram/SortingVisualizerApp")!) {
                                 Image(systemName: "arrow.up.right.square")
@@ -151,7 +151,7 @@ struct AboutView: View {
                             .padding(.bottom, 2)
                         
                         Text("Created as a SwiftUI learning project")
-                        Text("Built with Cursor, Claude and ChatGPT assistance")
+                        Text("Built with Cursor")
                         
                         HStack {
                             Text("License:")
