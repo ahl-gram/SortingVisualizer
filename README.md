@@ -1,10 +1,10 @@
 # Sorting Visualizer
 
-A SwiftUI-based iOS application built with Cursor, and help from Claude and ChatGPT that provides an interactive and educational visualization of various sorting algorithms with real-time animation and audio feedback.
+A SwiftUI-based iOS application built with Cursor that provides an interactive and educational visualization of various sorting algorithms with real-time animation and audio feedback.
 
 ## Features
 
-- **Multiple Sorting Algorithms**: Visualize 10 different sorting algorithms:
+- **Multiple Sorting Algorithms**: Visualize 12 different sorting algorithms:
   - Bubble Sort (O(n²))
   - Quick Sort (O(n log n))
   - Merge Sort (O(n log n))
@@ -15,6 +15,9 @@ A SwiftUI-based iOS application built with Cursor, and help from Claude and Chat
   - Bucket Sort (O(n+k))
   - Selection Sort (O(n²))
   - Shell Sort (O(n (log n)²))
+  - Cube Sort (O(n log n))
+  - Bogo Sort (O(n!))
+
 
 - **Interactive Controls**:
   - Adjust array size (10-100 elements) with a slider
