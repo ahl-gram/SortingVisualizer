@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-/// An implementation of CubeSort, which is a variation of a bottom-up merge sort.
+/// An simplified implementation of CubeSort, using a variation of a bottom-up merge sort.
 /// It works by sorting small "cubes" of data first, then merging them.
 enum CubeSort {
     /// The size of the initial chunks to be sorted.

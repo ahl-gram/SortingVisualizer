@@ -47,7 +47,7 @@ enum SortingAlgorithmType: String, CaseIterable, Identifiable {
         case .shell:
             return "An in-place comparison sort that generalizes insertion sort by allowing the exchange of items that are far apart. It uses a gap sequence to compare elements that are a certain distance apart, reducing the number of comparisons needed. Average time complexity: O(n (log n)²)"
         case .cube:
-            return "A sort that works by dividing an array into small cubes, sorting each cube, and then merging the cubes back together. Average time complexity: O(n log n)"
+            return "This simplified sort works by dividing an array into small 'cubes', sorting each 'cube', and then merging the 'cubes' back together. Average time complexity: O(n log n)"
         }
     }
 
